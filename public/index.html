@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>API MAZE – Registration | 10X Club KARE</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+
+<!-- Razorpay -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<!-- QR Code -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<!-- jsPDF (PDF generator) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+  :root{
+    --glass: rgba(255,255,255,0.08);
+    --glass-strong: rgba(255,255,255,0.15);
+    --border: rgba(255,255,255,0.18);
+    --white: #fff;
+    --accent: #1657ff;
+    --accent-2:#F2551D;
+    --bg: #000;
+    --radius: 24px;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg);
+    color: var(--white);
+    min-height:100vh;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(22,87,255,0.08) 0 60% , transparent 60%),
+      radial-gradient(circle at 90% 80%, rgba(242,85,29,0.08) 0 60% , transparent 60%);
+    background-attachment: fixed;
+    overflow-x:hidden;
+  }
+  .container{
+    max-width:1100px;
+    margin:0 auto;
+    padding:24px 16px 120px;
+  }
+  .glass{
+    background: var(--glass);
+    border:1px solid var(--border);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 40px rgba(0,0,0,.3);
+  }
+  header.hero{
+    display:flex;
+    gap:24px;
+    align-items:center;
+    padding:32px 28px;
+    margin:24px 0 40px;
+    position:relative;
+    overflow:hidden;
+    flex-wrap:wrap;
+  }
+  header.hero::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
+    transform:skewX(-20deg) translateX(-100%);
+    animation:shine 5s infinite;
+  }
+  @keyframes shine{
+    0%{ transform:skewX(-20deg) translateX(-120%); }
+    100%{ transform:skewX(-20deg) translateX(120%); }
+  }
+  .logos{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .logos img{
+    height:70px; object-fit:contain;
+    background: rgba(255,255,255,0.04);
+    border-radius:14px; padding:8px 12px;
+  }
+  .hero h1{
+    font-size:2.2rem; margin:0;
+  }
+  .tag{
+    display:inline-block;
+    margin-top:8px;
+    background:rgba(255,255,255,0.08);
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:0.9rem;
+    letter-spacing:1px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
+    gap:28px;
+    align-items:start;
+  }
+  .event-card{
+    padding:24px 22px;
+  }
+  .event-card h2{
+    margin:0 0 12px;
+    letter-spacing:.5px;
+  }
+  .event-meta{
+    color:#ddd;
+    margin:4px 0 12px;
+  }
+  form#regForm{
+    padding:32px 26px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+  label{
+    font-size:.9rem;
+    letter-spacing:.4px;
+    color:#e7e7e7;
+  }
+  input, select, textarea{
+    width:100%;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px;
+    color:#fff;
+    padding:12px 14px;
+    font-family:inherit;
+    outline:none;
+    transition:border .25s;
+  }
+  input:focus, select:focus, textarea:focus{
+    border-color: var(--accent);
+  }
+  .btn{
+    appearance:none;
+    border:none;
+    border-radius:999px;
+    padding:14px 24px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .25s;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+  .btn-primary{
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color:#fff;
+    box-shadow: 0 10px 20px rgba(22,87,255,.15);
+  }
+  .btn-primary:hover{ transform:translateY(-1px) scale(1.01); }
+  .price{
+    font-size:1.5rem;
+    font-weight:700;
+  }
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.7);
+    display:none; align-items:center; justify-content:center;
+    z-index:2000;
+    padding:20px;
+  }
+  .modal{
+    max-width:480px; width:100%;
+    padding:24px 22px 28px;
+    position:relative;
+  }
+  .modal h3{
+    margin:0 0 14px;
+    text-align:center;
+  }
+  .receipt-header{
+    display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:18px;
+  }
+  .receipt-header img{
+    height:42px; object-fit:contain;
+    background:rgba(255,255,255,0.06); border-radius:8px; padding:6px;
+  }
+  .receipt-row{
+    display:flex; justify-content:space-between; margin-bottom:8px;
+    font-size:.92rem;
+  }
+  .qrbox{
+    display:flex; justify-content:center; margin:18px 0 8px;
+  }
+  .token{
+    text-align:center; font-weight:700; letter-spacing:1px; margin-top:8px;
+  }
+  .divider{
+    height:1px; background:rgba(255,255,255,0.07); margin:12px 0 16px;
+  }
+  .close-x{
+    position:absolute; right:14px; top:12px;
+    font-size:22px; cursor:pointer; opacity:.7;
+  }
+  .blob{
+    position:absolute; border-radius:50%;
+    filter: blur(80px); opacity:.06; z-index:-1;
+  }
+  .blob.b1{ width:380px; height:380px; top:-60px; left:-80px; background:#1657ff; animation:float 12s ease-in-out infinite; }
+  .blob.b2{ width:300px; height:300px; bottom:-40px; right:-80px; background:#F2551D; animation:float 14s ease-in-out infinite reverse; }
+  @keyframes float{
+    0%{ transform:translateY(0) translateX(0) scale(1);}
+    50%{ transform:translateY(-20px) translateX(10px) scale(1.05);}
+    100%{ transform:translateY(0) translateX(0) scale(1);}
+  }
+  @media(max-width:520px){
+    .hero h1{ font-size:1.8rem; }
+    form#regForm{ padding:24px 18px; }
+    .event-card{ padding:20px 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HERO -->
+  <header class="hero glass">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+
+    <div class="logos">
+      <img src="img/klu.png" alt="KARE">
+      <img src="img/image 26.png" alt="10X Club KARE">
+    </div>
+
+    <div>
+      <h1>API MAZE</h1>
+      <div class="tag">August 2, 2025 • KARE Campus</div>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- Event Info -->
+    <section class="event-card glass">
+      <h2>Event Details</h2>
+      <div class="event-meta">Organized by <strong>10X Club – KARE Student Chapter</strong></div>
+      <ul style="line-height:1.8;margin:0 0 18px 18px;">
+        <li>Build-an-App Challenge using API</li>
+        <li>3 or 4 members per Team</li>
+        <li>Limited seats</li>
+      </ul>
+
+      <div class="price">₹ 100 + ₹ 2.50 (GST)</div>
+      <small style="opacity:.8;">(includes 1 (EE) Credit & certificate)</small>
+    </section>
+
+    <!-- Registration Form -->
+    <section class="glass">
+      <form id="regForm">
+        <h2 style="margin:0 0 16px;">Register Now</h2>
+
+        <div>
+          <label for="name">Full Name</label>
+          <input id="name" name="name" required />
+        </div>
+
+        <div>
+          <label for="regno">Register Number</label>
+          <input id="regno" name="regno" required />
+        </div>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <div style="flex:1 1 140px;">
+            <label for="year">Year</label>
+            <select id="year" name="year" required>
+              <option value="">Select</option>
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+              <option>4th Year</option>
+            </select>
+          </div>
+          <div style="flex:1 1 140px;">
+          <label for="dept">Department</label>
+            <select id="dept" name="dept" required>
+              <option value="">Select</option>
+              <option>IT</option>
+              <option>CSE</option>
+              <option>ECE</option>
+              <option>EEE</option>
+              <option>MECH</option>
+              <option>CIVIL</option>
+              <option>AIDS</option>
+              <option>AIML</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required />
+        </div>
+
+        <div>
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" type="tel" required />
+        </div>
+
+        <div>
+          <label>Amount</label>
+          <input value="₹ 102.50" disabled />
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-primary" id="payBtn">Pay Now</button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+
+<!-- Receipt Modal -->
+<div class="modal-overlay" id="receiptOverlay">
+  <div class="modal glass" id="receiptCard">
+    <span class="close-x" id="closeReceipt">&times;</span>
+
+    <div class="receipt-header">
+      <img src="img/klu.png" alt="KARE">
+      <img src="img/image 26.png" alt="10X Club">
+    </div>
+
+    <h3>API MAZE • Entry Token</h3>
+
+    <div class="divider"></div>
+
+    <div class="receipt-row"><span>Participant No.</span><span id="r_pno"></span></div>
+    <div class="receipt-row"><span>Name</span><span id="r_name"></span></div>
+    <div class="receipt-row"><span>Reg No.</span><span id="r_regno"></span></div>
+    <div class="receipt-row"><span>Year</span><span id="r_year"></span></div>
+    <div class="receipt-row"><span>Department</span><span id="r_dept"></span></div>
+    <div class="receipt-row"><span>Phone</span><span id="r_phone"></span></div>
+    <div class="receipt-row"><span>Email</span><span id="r_email"></span></div>
+    <div class="receipt-row"><span>Amount</span><span>₹ 100</span></div>
+    <div class="receipt-row"><span>Paid On</span><span id="r_time"></span></div>
+    <div class="receipt-row"><span>Payment ID</span><span id="r_payid"></span></div>
+
+    <div class="divider"></div>
+
+    <div class="qrbox">
+      <div id="qr"></div>
+    </div>
+    <div class="token" id="r_token"></div>
+
+    <div style="margin-top:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn btn-primary" id="downloadPdf">Download PDF</button>
+      <button class="btn btn-ghost" id="closeReceipt2">Close</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+/* ---------- Firebase (client analytics only) ---------- */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCzCBr-sZ_XiA1qiHjy2Ks0RDUJqELXjkY",
+  authDomain: "xclub-ac88a.firebaseapp.com",
+  projectId: "xclub-ac88a",
+  storageBucket: "xclub-ac88a.firebasestorage.app",
+  messagingSenderId: "929300450378",
+  appId: "1:929300450378:web:7d3ed01c4f270c3a136ab3",
+  measurementId: "G-66T0PCEXT0"
+};
+const app = initializeApp(firebaseConfig);
+getAnalytics(app);
+
+/* ---------- Config ---------- */
+const API_BASE = "";               // same origin (firebase hosting rewrites to functions)
+const AMOUNT_RUPEES = 100;
+
+const payBtn = document.getElementById('payBtn');
+const receiptOverlay = document.getElementById('receiptOverlay');
+const closeReceipt = document.getElementById('closeReceipt');
+const closeReceipt2 = document.getElementById('closeReceipt2');
+const downloadPdf = document.getElementById('downloadPdf');
+
+const rFields = {
+  pno:  document.getElementById('r_pno'),
+  name: document.getElementById('r_name'),
+  regno: document.getElementById('r_regno'),
+  year: document.getElementById('r_year'),
+  dept: document.getElementById('r_dept'),
+  phone: document.getElementById('r_phone'),
+  email: document.getElementById('r_email'),
+  time: document.getElementById('r_time'),
+  payid: document.getElementById('r_payid'),
+  token: document.getElementById('r_token')
+};
+
+let formDataCache = null;
+
+payBtn.addEventListener('click', async () => {
+  const form = document.getElementById('regForm');
+  if (!form.reportValidity()) return;
+
+  formDataCache = collectFormData();
+
+  // 1) Create order on Firebase Functions
+  const order = await fetch(`${API_BASE}/api/create-order`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ amount: AMOUNT_RUPEES })
+  }).then(r => r.json());
+
+  const options = {
+    key: order.key_id,
+    amount: order.amount,
+    currency: "INR",
+    name: "10X Club - KARE",
+    description: "API MAZE Registration",
+    image: "img/10x-logo.png",
+    order_id: order.order_id,
+    prefill: {
+      name: formDataCache.name,
+      email: formDataCache.email,
+      contact: formDataCache.phone
+    },
+    notes: {
+      regno: formDataCache.regno,
+      year: formDataCache.year,
+      dept: formDataCache.dept,
+      event: "API MAZE"
+    },
+    theme: { color: "#1657FF" },
+
+    handler: async function (response) {
+      // 2) Verify + store on Firebase Functions
+      const verify = await fetch(`${API_BASE}/api/verify-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          formData: formDataCache
+        })
+      }).then(r => r.json());
+
+      if (!verify.ok) {
+        alert("Payment verification failed. Please contact support.");
+        return;
+      }
+
+      const paidAt = new Date().toISOString();
+      showReceipt(response.razorpay_payment_id, verify.token, paidAt, verify.participant_no);
+    },
+    modal: {
+      ondismiss: function(){ console.log("Payment popup closed"); }
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+});
+
+function collectFormData(){
+  return {
+    name:  document.getElementById('name').value.trim(),
+    regno: document.getElementById('regno').value.trim(),
+    year:  document.getElementById('year').value,
+    dept:  document.getElementById('dept').value,
+    email: document.getElementById('email').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+  };
+}
+
+function showReceipt(paymentId, tokenId, isoTime, participantNo){
+  const time = new Date(isoTime).toLocaleString();
+
+  rFields.pno.textContent   = participantNo;
+  rFields.name.textContent  = formDataCache.name;
+  rFields.regno.textContent = formDataCache.regno;
+  rFields.year.textContent  = formDataCache.year;
+  rFields.dept.textContent  = formDataCache.dept;
+  rFields.phone.textContent = formDataCache.phone;
+  rFields.email.textContent = formDataCache.email;
+  rFields.time.textContent  = time;
+  rFields.payid.textContent = paymentId;
+  rFields.token.textContent = tokenId;
+
+  const qrPayload = JSON.stringify({
+    participant_no: participantNo,
+    token: tokenId,
+    name: formDataCache.name,
+    regno: formDataCache.regno,
+    event: "API MAZE",
+    date: "2025-08-02"
+  });
+
+  document.getElementById('qr').innerHTML = "";
+  new QRCode(document.getElementById("qr"), {
+    text: qrPayload,
+    width: 160,
+    height: 160,
+    colorDark : "#ffffff",
+    colorLight : "transparent",
+    correctLevel : QRCode.CorrectLevel.H
+  });
+
+  receiptOverlay.style.display = 'flex';
+}
+
+closeReceipt.addEventListener('click', ()=> receiptOverlay.style.display = 'none');
+closeReceipt2.addEventListener('click', ()=> receiptOverlay.style.display = 'none');
+receiptOverlay.addEventListener('click', (e)=> {
+  if(e.target === receiptOverlay) receiptOverlay.style.display = 'none';
+});
+
+// -------- PDF with jsPDF --------
+downloadPdf.addEventListener('click', buildPdfWithJsPDF);
+
+async function buildPdfWithJsPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+  const pageWidth  = doc.internal.pageSize.getWidth();
+  const marginX    = 50;
+  let   y          = 60;
+
+  const row = (label, value) => {
+    doc.setFont('helvetica', 'bold');   doc.text(label, marginX, y);
+    doc.setFont('helvetica', 'normal'); doc.text(value || '-', pageWidth - marginX, y, { align: 'right' });
+    y += 22;
+  };
+
+  const kareLogo = await toDataURL('img/klu.png');
+  const clubLogo = await toDataURL('img/image 26.png');
+
+  const qrCanvas = document.querySelector('#qr canvas');
+  const qrData   = qrCanvas ? qrCanvas.toDataURL('image/png') : null;
+
+  doc.addImage(kareLogo, 'PNG', marginX, 30, 70, 70);
+  doc.addImage(clubLogo, 'PNG', pageWidth - marginX - 70, 30, 70, 70);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.text('API MAZE – ENTRY TOKEN', pageWidth / 2, 55, { align: 'center' });
+
+  doc.setFontSize(12);
+  doc.setTextColor(120);
+  doc.text('10X Club – KARE Student Chapter', pageWidth / 2, 75, { align: 'center' });
+  doc.setTextColor(0);
+
+  y = 130;
+  doc.setDrawColor(220);
+  doc.line(marginX, y, pageWidth - marginX, y);
+  y += 30;
+
+  row('Participant No.', document.getElementById('r_pno').textContent);
+  row('Name',        rFields.name.textContent);
+  row('Reg No.',     rFields.regno.textContent);
+  row('Year',        rFields.year.textContent);
+  row('Department',  rFields.dept.textContent);
+  row('Phone',       rFields.phone.textContent);
+  row('Email',       rFields.email.textContent);
+  row('Amount',      '₹100');
+  row('Paid On',     rFields.time.textContent);
+  row('Payment ID',  rFields.payid.textContent);
+
+  y += 10;
+  doc.setDrawColor(220);
+  doc.line(marginX, y, pageWidth - marginX, y);
+  y += 20;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('Token', marginX, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(rFields.token.textContent, pageWidth - marginX, y, { align: 'right' });
+  y += 20;
+
+  if(qrData){
+    const qrSize = 150;
+    const qrX = (pageWidth - qrSize) / 2;
+    doc.addImage(qrData, 'PNG', qrX, y, qrSize, qrSize);
+    y += qrSize + 20;
+  }
+
+  doc.setFontSize(10);
+  doc.setTextColor(120);
+  doc.text('Please bring this token (digital or printed) to the event check-in.', pageWidth/2, y, { align: 'center' });
+
+  doc.save('API_MAZE_Token.pdf');
+}
+
+async function toDataURL(url){
+  try{
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  }catch(e){
+    const c = document.createElement('canvas');
+    c.width = c.height = 10;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0,0,10,10);
+    return c.toDataURL();
+  }
+}
+</script>
+</body>
+</html>

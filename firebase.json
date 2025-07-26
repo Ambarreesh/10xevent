@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "source": "functions"
+  },
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      { "source": "/api/create-order", "function": "createOrder" },
+      { "source": "/api/verify-payment", "function": "verifyPayment" }
+    ]
+  }
+}

@@ -3,215 +3,129 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>API MAZE – Registration | 10X Club KARE</title>
+<title>API MAZE • Event Console – 10X Club KARE</title>
 
-<!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
-
-<!-- QR Code -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
   :root{
-    --glass: rgba(255,255,255,0.08);
-    --glass-strong: rgba(255,255,255,0.15);
+    --glass: rgba(255,255,255,0.07);
+    --glass-strong: rgba(255,255,255,0.14);
     --border: rgba(255,255,255,0.18);
-    --white: #fff;
+    --text: #fff;
     --accent: #1657ff;
-    --accent-2:#F2551D;
-    --bg: #000;
-    --radius: 24px;
+    --accent2:#F2551D;
+    --success:#0f9d58;
+    --danger:#e53935;
+    --radius: 18px;
+    --shadow: 0 24px 40px rgba(0,0,0,.3);
   }
-  *{ box-sizing: border-box; }
+  *{ box-sizing:border-box; }
   body{
-    margin:0;
-    font-family: 'Montserrat', sans-serif;
-    background: var(--bg);
-    color: var(--white);
-    min-height:100vh;
+    margin:0; font-family:'Montserrat',sans-serif; background:#000; color:var(--text);
     background-image:
-      radial-gradient(circle at 10% 20%, rgba(22,87,255,0.08) 0 60% , transparent 60%),
-      radial-gradient(circle at 90% 80%, rgba(242,85,29,0.08) 0 60% , transparent 60%);
+      radial-gradient(circle at 10% 20%, rgba(22,87,255,0.06) 0 55%, transparent 55%),
+      radial-gradient(circle at 90% 80%, rgba(242,85,29,0.06) 0 55%, transparent 55%);
     background-attachment: fixed;
-    overflow-x:hidden;
+    min-height:100vh;
   }
+  a{ color: var(--accent); }
+
   .container{
-    max-width:1100px;
-    margin:0 auto;
-    padding:24px 16px 120px;
+    max-width:1200px; margin:0 auto; padding:20px 16px 80px;
   }
   .glass{
-    background: var(--glass);
+    background:var(--glass);
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
     border:1px solid var(--border);
-    backdrop-filter: blur(18px) saturate(180%);
-    -webkit-backdrop-filter: blur(18px) saturate(180%);
     border-radius: var(--radius);
-    box-shadow: 0 24px 40px rgba(0,0,0,.3);
+    box-shadow: var(--shadow);
   }
   header.hero{
-    display:flex;
-    gap:24px;
-    align-items:center;
-    padding:32px 28px;
-    margin:24px 0 40px;
-    position:relative;
-    overflow:hidden;
-    flex-wrap:wrap;
+    display:flex; gap:18px; align-items:center; justify-content:space-between;
+    padding:22px 20px; margin:18px 0 24px; position:relative; overflow:hidden; flex-wrap:wrap;
   }
   header.hero::after{
-    content:"";
-    position:absolute; inset:0;
+    content:""; position:absolute; inset:0;
     background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
-    transform:skewX(-20deg) translateX(-100%);
-    animation:shine 5s infinite;
+    transform:skewX(-20deg) translateX(-100%); animation:shine 5s infinite;
   }
   @keyframes shine{
     0%{ transform:skewX(-20deg) translateX(-120%); }
     100%{ transform:skewX(-20deg) translateX(120%); }
   }
-  .logos{
-    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
-  }
+  .logos{ display:flex; align-items:center; gap:10px; }
   .logos img{
-    height:70px; object-fit:contain;
-    background: rgba(255,255,255,0.04);
-    border-radius:14px; padding:8px 12px;
+    height:56px; object-fit:contain; background:rgba(255,255,255,0.05);
+    border-radius:12px; padding:6px 10px;
   }
-  .hero h1{
-    font-size:2.2rem; margin:0;
-  }
+  h1,h2,h3{ margin:0 0 12px; }
   .tag{
-    display:inline-block;
-    margin-top:8px;
-    background:rgba(255,255,255,0.08);
-    padding:6px 12px;
-    border-radius:999px;
-    font-size:0.9rem;
-    letter-spacing:1px;
+    display:inline-block; padding:4px 10px; border-radius:999px;
+    background:rgba(255,255,255,0.08); font-size:.85rem;
   }
   .grid{
-    display:grid;
-    grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
-    gap:28px;
-    align-items:start;
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px;
   }
-  .event-card{
-    padding:24px 22px;
-  }
-  .event-card h2{
-    margin:0 0 12px;
-    letter-spacing:.5px;
-  }
-  .event-meta{
-    color:#ddd;
-    margin:4px 0 12px;
-  }
-  form#regForm{
-    padding:32px 26px;
-    display:flex;
-    flex-direction:column;
-    gap:18px;
-  }
-  label{
-    font-size:.9rem;
-    letter-spacing:.4px;
-    color:#e7e7e7;
-  }
-  input, select, textarea{
-    width:100%;
-    background:rgba(255,255,255,0.04);
-    border:1px solid rgba(255,255,255,0.08);
-    border-radius:12px;
-    color:#fff;
-    padding:12px 14px;
-    font-family:inherit;
-    outline:none;
-    transition:border .25s;
-  }
-  input:focus, select:focus, textarea:focus{
-    border-color: var(--accent);
-  }
+  section.block{ padding:20px 18px; }
   .btn{
-    appearance:none;
-    border:none;
-    border-radius:999px;
-    padding:14px 24px;
-    font-weight:700;
-    cursor:pointer;
-    transition:all .25s;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
+    appearance:none; border:none; border-radius:999px; padding:12px 18px; font-weight:700; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:.2s;
   }
-  .btn-primary{
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color:#fff;
-    box-shadow: 0 10px 20px rgba(22,87,255,.15);
+  .btn-primary{ background:linear-gradient(135deg, var(--accent), var(--accent2)); color:#fff; }
+  .btn-outline{ background:transparent; border:1px solid rgba(255,255,255,.2); color:#fff; }
+  .btn-danger{ background: var(--danger); color:#fff; }
+  .btn[disabled]{ opacity:.5; cursor:not-allowed; }
+  input, select, textarea{
+    width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,0.06); color:#fff; outline:none; font-family:inherit;
   }
-  .btn-primary:hover{ transform:translateY(-1px) scale(1.01); }
-  .btn-ghost{
-    background: transparent;
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.15);
+  label{ display:block; margin-bottom:6px; font-size:.9rem; opacity:.85; }
+  .muted{ opacity:.7; font-size:.85rem; }
+  .flex{ display:flex; gap:10px; flex-wrap:wrap; }
+  .hidden{ display:none !important; }
+  .tabbar{
+    display:flex; gap:8px; margin:22px 0 14px; flex-wrap:wrap;
   }
-  .price{
-    font-size:1.5rem;
-    font-weight:700;
+  .tab{
+    padding:8px 14px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid transparent; cursor:pointer;
+    font-weight:600; font-size:.9rem;
   }
-  .modal-overlay{
-    position:fixed; inset:0;
-    background:rgba(0,0,0,.7);
-    display:none; align-items:center; justify-content:center;
-    z-index:2000;
-    padding:20px;
+  .tab.active{ border-color:rgba(255,255,255,.25); background:rgba(255,255,255,.12); }
+  table{
+    width:100%; border-collapse:collapse; font-size:.92rem;
   }
-  .modal{
-    max-width:520px; width:100%;
-    padding:24px 22px 28px;
-    position:relative;
+  th,td{
+    border-bottom:1px solid rgba(255,255,255,.08); padding:8px 6px; vertical-align:top;
   }
-  .modal h3{
-    margin:0 0 14px;
-    text-align:center;
+  th{text-align:left; position:sticky; top:0; background:rgba(0,0,0,.35); backdrop-filter:blur(6px); z-index:1;}
+  .score-input{
+    width:64px; text-align:center; border-radius:8px; padding:6px 4px; background:rgba(255,255,255,0.04);
   }
-  .close-x{
-    position:absolute; right:14px; top:12px;
-    font-size:22px; cursor:pointer; opacity:.7;
+  .pill{
+    display:inline-block; padding:2px 8px; font-size:.75rem; border-radius:999px; margin-left:4px;
   }
-  .divider{
-    height:1px; background:rgba(255,255,255,0.07); margin:12px 0 16px;
+  .pill.judge{ background:rgba(22,87,255,.2); }
+  .pill.participant{ background:rgba(242,85,29,.2); }
+  .pill.locked{ background:rgba(15,157,88,.2); }
+  .countdown{
+    display:flex; gap:10px; align-items:center; font-weight:600; letter-spacing:.4px;
   }
-  .qrpay-box{
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; margin:14px 0 18px;
+  .countdown span{
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+    padding:6px 10px; border-radius:8px; min-width:56px; text-align:center;
   }
-  .blob{
-    position:absolute; border-radius:50%;
-    filter: blur(80px); opacity:.06; z-index:-1;
+  .inline-code{
+    background:rgba(255,255,255,.06); padding:2px 6px; border-radius:6px; font-family:monospace;
   }
-  .blob.b1{ width:380px; height:380px; top:-60px; left:-80px; background:#1657ff; animation:float 12s ease-in-out infinite; }
-  .blob.b2{ width:300px; height:300px; bottom:-40px; right:-80px; background:#F2551D; animation:float 14s ease-in-out infinite reverse; }
-  @keyframes float{
-    0%{ transform:translateY(0) translateX(0) scale(1);}
-    50%{ transform:translateY(-20px) translateX(10px) scale(1.05);}
-    100%{ transform:translateY(0) translateX(0) scale(1);}
+  .toast{
+    position:fixed; bottom:18px; right:18px; background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.15); color:#fff; padding:10px 14px; border-radius:10px; display:none;
   }
-  @media(max-width:520px){
-    .hero h1{ font-size:1.8rem; }
-    form#regForm{ padding:24px 18px; }
-    .event-card{ padding:20px 18px; }
-  }
-
-  /* Spinner for Complete Payment button */
-  .btn-spinner{
-    display:none;
-    width:16px; height:16px;
-    border:2px solid rgba(255,255,255,.4);
-    border-top-color:#fff;
-    border-radius:50%;
-    animation:spin .6s linear infinite;
-  }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .sticky-top{ position:sticky; top:0; z-index:50; }
 </style>
 </head>
 <body>
@@ -219,160 +133,274 @@
 
   <!-- HERO -->
   <header class="hero glass">
-    <div class="blob b1"></div>
-    <div class="blob b2"></div>
-
     <div class="logos">
+      <img src="img/image 26.png" alt="10X Club">
       <img src="img/klu.png" alt="KARE">
-      <img src="img/image 26.png" alt="10X Club KARE">
     </div>
 
-    <div>
-      <h1>API MAZE</h1>
-      <div class="tag">August 2, 2025 • KARE Campus</div>
+    <div style="flex:1 1 auto;">
+      <h1>API MAZE – Event Console</h1>
+      <div class="tag">Aug 2, 2025 • Starts 9:30 AM • 8 Hours</div>
+      <div class="countdown" id="countdown"></div>
+    </div>
+
+    <!-- Auth -->
+    <div id="authBox">
+      <button class="btn btn-outline" id="openSignin">Sign in</button>
+
+      <div id="profileBox" class="hidden" style="position:relative;">
+        <button class="btn btn-outline" id="avatarBtn" style="width:38px;height:38px;border-radius:50%;padding:0;font-weight:700;">U</button>
+        <div id="profileMenu" class="glass hidden" style="position:absolute; right:0; top:48px; min-width:220px; padding:10px;">
+          <div style="padding:6px 8px; font-size:.85rem; opacity:.8;" id="profileEmail">user@klu.ac.in</div>
+          <hr style="border:none;border-top:1px solid rgba(255,255,255,.1); margin:6px 0;">
+          <button class="btn btn-outline" id="viewProfileBtn" style="width:100%; margin:4px 0;">Profile</button>
+          <button class="btn btn-outline" id="logoutBtn" style="width:100%; margin:4px 0;">Logout</button>
+        </div>
+      </div>
     </div>
   </header>
 
-  <div class="grid">
-
-    <!-- Event Info -->
-    <section class="event-card glass">
-      <h2>Event Details</h2>
-      <div class="event-meta">Organized by <strong>10X Club – KARE Student Chapter</strong></div>
-      <ul style="line-height:1.8;margin:0 0 18px 18px;">
-        <li>Build-an-App Challenge using API</li>
-        <li>3 or 4 members per Team</li>
-        <li>Limited seats</li>
-      </ul>
-
-      <div class="price">₹ 100</div>
-      <small style="opacity:.8;">(includes 1 (EE) Credit & certificate)</small>
-    </section>
-
-    <!-- Registration Form -->
-    <section class="glass">
-      <form id="regForm">
-        <h2 style="margin:0 0 16px;">Register Now</h2>
-
-        <div>
-          <label for="name">Full Name</label>
-          <input id="name" name="name" required />
-        </div>
-
-        <div>
-          <label for="regno">Register Number</label>
-          <input id="regno" name="regno" required />
-        </div>
-
-        <div style="display:flex; gap:12px; flex-wrap:wrap;">
-          <div style="flex:1 1 140px;">
-            <label for="year">Year</label>
-            <select id="year" name="year" required>
-              <option value="">Select</option>
-              <option>1st Year</option>
-              <option>2nd Year</option>
-              <option>3rd Year</option>
-              <option>4th Year</option>
-            </select>
-          </div>
-          <div style="flex:1 1 140px;">
-          <label for="dept">Department</label>
-            <select id="dept" name="dept" required>
-              <option value="">Select</option>
-              <option>IT</option>
-              <option>CSE</option>
-              <option>ECE</option>
-              <option>EEE</option>
-              <option>MECH</option>
-              <option>CIVIL</option>
-              <option>AIDS</option>
-              <option>AIML</option>
-              <option>Other</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" required />
-        </div>
-
-        <div>
-          <label for="phone">Phone</label>
-          <input id="phone" name="phone" type="tel" required />
-        </div>
-
-        <div>
-          <label>Amount</label>
-          <input value="₹ 100.00" disabled />
-        </div>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button type="button" class="btn btn-primary" id="payBtn">Pay Now</button>
-        </div>
-      </form>
-    </section>
+  <!-- Tabs -->
+  <div class="tabbar sticky-top glass" style="padding:8px;">
+    <button class="tab active" data-tab="overviewTab">Overview</button>
+    <button class="tab" data-tab="teamTab">Team</button>
+    <button class="tab" data-tab="roundsTab">Rounds & Submissions</button>
+    <button class="tab" data-tab="leaderboardTab">Leaderboard</button>
+    <button class="tab" data-tab="judgeTab">Judge Console <span class="pill judge">staff</span></button>
   </div>
+
+  <!-- Overview -->
+  <section id="overviewTab" class="block glass">
+    <h2>Event Overview</h2>
+    <p>
+      **API Maze** is a Build‑an‑App challenge. Use any public API (OpenWeather, Google Books, Jokes API, etc.) to craft
+      something useful/fun in **8 hours**. You can participate in **teams of 2–4 members** (you all registered individually; now you’ll form your team here).
+    </p>
+
+    <h3>Prizes & Credits</h3>
+    <ul>
+      <li>1st Prize – ₹3000</li>
+      <li>2nd Prize – ₹1500</li>
+      <li>3rd Prize – ₹1000</li>
+      <li>1 EE Credit for qualified participants</li>
+      <li>Certificate for everyone</li>
+    </ul>
+
+    <h3>Rounds (Total 100 Marks)</h3>
+    <ol>
+      <li>
+        <strong>Round 1 – Problem Identification & Planning (1 hour) — 15 marks</strong><br/>
+        Problem relevance & clarity (5), Feasibility & creativity (5), Relevance of chosen API (5)
+      </li>
+      <li>
+        <strong>Round 2 – App/Page Development (5 hours) — 55 marks</strong><br/>
+        Correct & useful API integration (20), Functionality (20), UI/UX (10), Code quality (5)
+      </li>
+      <li>
+        <strong>Round 3 – Final Presentation & Demo (2 hours) — 30 marks</strong><br/>
+        Explanation & demo (10), Creativity & impact (10), Time mgmt (5), Team collaboration/Solo effort (5)
+      </li>
+    </ol>
+  </section>
+
+  <!-- Team -->
+  <section id="teamTab" class="block glass hidden">
+    <h2>Your Team</h2>
+    <div id="teamNotSigned" class="muted">Sign in to create/join a team.</div>
+
+    <div id="teamSection" class="hidden">
+      <div id="teamInfo" class="hidden"></div>
+
+      <div id="teamActions">
+        <button class="btn btn-primary" id="createTeamBtn">Create Team</button>
+        <button class="btn btn-outline" id="joinTeamBtn">Join Team with Code</button>
+      </div>
+
+      <!-- Create team modal-ish block -->
+      <div id="createTeamBox" class="hidden" style="margin-top:16px;">
+        <h3>Create Team</h3>
+        <div class="muted">Min 2, Max 4 members</div>
+        <label>Team Name</label>
+        <input id="createTeamName" placeholder="Your awesome team name" />
+        <button class="btn btn-primary" id="doCreateTeam">Create</button>
+        <button class="btn btn-outline" id="cancelCreateTeam">Cancel</button>
+      </div>
+
+      <!-- Join team -->
+      <div id="joinTeamBox" class="hidden" style="margin-top:16px;">
+        <h3>Join Team</h3>
+        <label>Join Code</label>
+        <input id="joinCodeInput" placeholder="e.g., X1Y2Z3" />
+        <button class="btn btn-primary" id="doJoinTeam">Join</button>
+        <button class="btn btn-outline" id="cancelJoinTeam">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rounds -->
+  <section id="roundsTab" class="block glass hidden">
+    <h2>Rounds & Submissions</h2>
+    <div id="roundsNotSigned" class="muted">Sign in & join a team to submit.</div>
+
+    <div id="roundsSection" class="hidden">
+      <div id="roundsLockedNote" class="muted hidden" style="margin-bottom:10px;">
+        Your team is locked. You can submit/update round details.
+      </div>
+
+      <!-- Round 1 -->
+      <div class="glass" style="padding:16px;margin-bottom:14px;">
+        <h3>Round 1 – Problem Identification & Planning (15)</h3>
+        <form id="r1Form">
+          <label>Problem (what are you solving?)</label>
+          <textarea id="r1Problem" rows="3" required></textarea>
+
+          <label>Proposed Solution (short)</label>
+          <textarea id="r1Solution" rows="3" required></textarea>
+
+          <label>Chosen Public API</label>
+          <input id="r1Api" required />
+
+          <button class="btn btn-primary" id="r1Save">Save / Update</button>
+        </form>
+      </div>
+
+      <!-- Round 2 -->
+      <div class="glass" style="padding:16px;margin-bottom:14px;">
+        <h3>Round 2 – App/Page Development (55)</h3>
+        <form id="r2Form">
+          <label>GitHub/Repo URL</label>
+          <input id="r2Repo" placeholder="https://github.com/..." />
+
+          <label>Live / Demo URL</label>
+          <input id="r2Demo" placeholder="https://..." />
+
+          <label>Short Notes (optional)</label>
+          <textarea id="r2Notes" rows="3"></textarea>
+
+          <button class="btn btn-primary" id="r2Save">Save / Update</button>
+        </form>
+      </div>
+
+      <!-- Round 3 -->
+      <div class="glass" style="padding:16px;">
+        <h3>Round 3 – Final Presentation & Demo (30)</h3>
+        <form id="r3Form">
+          <label>Slides / Presentation Link</label>
+          <input id="r3Slides" placeholder="https://..." />
+
+          <label>Anything else to tell the jury?</label>
+          <textarea id="r3Notes" rows="3"></textarea>
+
+          <button class="btn btn-primary" id="r3Save">Save / Update</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Leaderboard -->
+  <section id="leaderboardTab" class="block glass hidden">
+    <h2>Leaderboard</h2>
+    <div class="muted" id="lbInfo">Scores appear as judges enter them.</div>
+    <div style="overflow:auto;">
+      <table id="leaderboardTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Team</th>
+            <th>R1 (15)</th>
+            <th>R2 (55)</th>
+            <th>R3 (30)</th>
+            <th>Total (100)</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboardBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Judge Console -->
+  <section id="judgeTab" class="block glass hidden">
+    <h2>Judge Console <span class="pill judge">staff</span></h2>
+    <div id="judgeNotAllowed" class="muted">You are not authorized as a judge.</div>
+
+    <div id="judgeSection" class="hidden">
+      <div style="margin-bottom:10px;">
+        <label>Round</label>
+        <select id="judgeRound">
+          <option value="1">Round 1 (15)</option>
+          <option value="2">Round 2 (55)</option>
+          <option value="3">Round 3 (30)</option>
+        </select>
+      </div>
+
+      <div style="overflow:auto; max-height:65vh;">
+        <table id="judgeTable">
+          <thead id="judgeHead"></thead>
+          <tbody id="judgeBody"></tbody>
+        </table>
+      </div>
+
+      <button class="btn btn-primary" id="saveScoresBtn" style="margin-top:8px;">Save Scores</button>
+    </div>
+  </section>
 </div>
 
-<!-- PAYMENT MODAL (QR + Txn ID entry) -->
-<div class="modal-overlay" id="paymentOverlay">
-  <div class="modal glass" id="paymentCard">
-    <span class="close-x" id="closePayment">&times;</span>
-    <h3>Pay ₹100 via UPI</h3>
-    <div class="divider"></div>
-
-    <div class="qrpay-box">
-      <div id="payQR"></div>
-      <div style="opacity:.8; font-size:.9rem;" id="upiText"></div>
+<!-- ===== Signin Modal ===== -->
+<div id="signinOverlay" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,.7); display:flex; align-items:center; justify-content:center; z-index:9999; padding:12px;">
+  <div class="glass" style="max-width:380px;width:100%;padding:18px 16px;position:relative;">
+    <img src="img/image 26.png" alt="logo" style="height:56px; display:block; margin:0 auto 12px;" />
+    <button style="position:absolute; top:8px; right:10px; background:transparent;border:none;color:#fff;font-size:22px;cursor:pointer;" id="signinClose">&times;</button>
+    <h3 style="text-align:center;margin-bottom:10px;">Sign in</h3>
+    <div id="signinError" class="muted" style="color:#ff7b7b; display:none; margin-bottom:6px;"></div>
+    <div style="display:flex; gap:8px; margin-bottom:12px;">
+      <button class="btn btn-outline" id="tabSignIn" style="flex:1;">Sign in</button>
+      <button class="btn btn-outline" id="tabSignUp" style="flex:1;">Sign up</button>
     </div>
 
-    <form id="paymentForm" style="display:flex; flex-direction:column; gap:14px;">
-      <div>
-        <label for="txnId">Transaction / UTR ID (required)</label>
-        <input id="txnId" name="txnId" required placeholder="e.g., 3245XXXXXXXX" />
-      </div>
-      <div>
-        <label for="payerName">Payer Name (as shown in app)</label>
-        <input id="payerName" name="payerName" placeholder="Optional" />
-      </div>
-      <div>
-        <label for="paidAmount">Amount Paid</label>
-        <input id="paidAmount" name="paidAmount" type="number" value="100" />
-      </div>
+    <!-- sign in -->
+    <form id="signinForm">
+      <label>Email (@klu.ac.in only)</label>
+      <input id="signinEmail" type="email" required placeholder="you@klu.ac.in" />
+      <label>Password</label>
+      <input id="signinPassword" type="password" required />
+      <button class="btn btn-primary" id="signinBtn" style="width:100%; margin-top:8px;">Sign in</button>
+      <button type="button" class="btn btn-outline" id="forgotBtn" style="width:100%; margin-top:6px;">Forgot password</button>
+      <button type="button" class="btn btn-outline" id="googleBtn" style="width:100%; margin-top:6px;">Sign in with Google</button>
+    </form>
 
-      <button type="submit" class="btn btn-primary" id="completePaymentBtn">
-        <span class="btn-text">Complete Payment</span>
-        <span class="btn-spinner"></span>
-      </button>
+    <!-- sign up -->
+    <form id="signupForm" class="hidden">
+      <label>Full Name</label>
+      <input id="signupName" />
+      <label>Email (@klu.ac.in only)</label>
+      <input id="signupEmail" type="email" required placeholder="you@klu.ac.in" />
+      <label>Password (min 6 chars)</label>
+      <input id="signupPassword" type="password" required />
+      <label>Confirm Password</label>
+      <input id="signupPassword2" type="password" required />
+      <button class="btn btn-primary" id="signupBtn" style="width:100%; margin-top:8px;">Create account</button>
+      <button type="button" class="btn btn-outline" id="googleBtn2" style="width:100%; margin-top:6px;">Sign up with Google</button>
     </form>
   </div>
 </div>
 
-<!-- SUCCESS POPUP -->
-<div class="modal-overlay" id="successOverlay">
-  <div class="modal glass">
-    <span class="close-x" id="closeSuccess">&times;</span>
-    <h3>Payment Submitted</h3>
-    <div class="divider"></div>
-    <p style="text-align:center; line-height:1.6;">
-      Thank you! You will get your entry pass through email soon.
-    </p>
-    <div style="display:flex; justify-content:center; margin-top:12px;">
-      <button class="btn btn-primary" id="okSuccess">OK</button>
-    </div>
-  </div>
-</div>
+<div class="toast" id="toast"></div>
 
+<!-- Firebase + App -->
 <script type="module">
-/* ---------- Firebase ---------- */
+/* ---------------- Firebase ---------------- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 import {
-  getFirestore, collection, doc, setDoc, serverTimestamp, runTransaction
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+  GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail,
+  signOut, createUserWithEmailAndPassword, updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc, getDocs, updateDoc, addDoc,
+  collection, serverTimestamp, query, where, orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/* your config */
+/* ------------- CONFIG ------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyCzCBr-sZ_XiA1qiHjy2Ks0RDUJqELXjkY",
   authDomain: "xclub-ac88a.firebaseapp.com",
@@ -382,175 +410,783 @@ const firebaseConfig = {
   appId: "1:929300450378:web:7d3ed01c4f270c3a136ab3",
   measurementId: "G-66T0PCEXT0"
 };
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
 
-const app = initializeApp(firebaseConfig);
-getAnalytics(app);
-const db = getFirestore(app);
+/* ---------------- Constants ---------------- */
+const EVENT_ID   = "api-maze-2025";
+const EVENT_NAME = "API MAZE";
+const START_AT   = new Date("2025-08-02T09:30:00+05:30"); // 9:30 AM IST
 
-/* ---------- Constants ---------- */
-const EVENT_ID = "api-maze-2025";
-const AMOUNT_RUPEES = 100;
+/* ---------------- State ---------------- */
+let user = null;
+let eventConfig = { judges: [], minTeamSize: 2, maxTeamSize: 4 };
+let myTeamDoc = null;           // { id, data... }
+let isJudge = false;
 
-/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-   >>>  REPLACE WITH YOUR DETAILS  <<<
-   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-*/
-const UPI_ID   = "your-upi-id@bank";     // <<-- CHANGE THIS
-const UPI_NAME = "10X Club - KARE";      // <<-- CHANGE THIS
+/* ---------------- DOM ---------------- */
+const tabs = document.querySelectorAll('.tab');
+const tabBlocks = {
+  overviewTab:    document.getElementById('overviewTab'),
+  teamTab:        document.getElementById('teamTab'),
+  roundsTab:      document.getElementById('roundsTab'),
+  leaderboardTab: document.getElementById('leaderboardTab'),
+  judgeTab:       document.getElementById('judgeTab')
+};
 
-/* ---------- Elements ---------- */
-const payBtn           = document.getElementById('payBtn');
-const paymentOverlay   = document.getElementById('paymentOverlay');
-const closePayment     = document.getElementById('closePayment');
-const paymentForm      = document.getElementById('paymentForm');
-const successOverlay   = document.getElementById('successOverlay');
-const closeSuccess     = document.getElementById('closeSuccess');
-const okSuccess        = document.getElementById('okSuccess');
-const payQRContainer   = document.getElementById('payQR');
-const upiTextEl        = document.getElementById('upiText');
-const completePaymentBtn = document.getElementById('completePaymentBtn');
-const completeBtnText    = completePaymentBtn?.querySelector('.btn-text');
-const completeBtnSpin    = completePaymentBtn?.querySelector('.btn-spinner');
+const countdownEl       = document.getElementById('countdown');
+const toastEl           = document.getElementById('toast');
 
-let formDataCache = null;
-let submitting = false;
+const openSignin        = document.getElementById('openSignin');
+const signinOverlay     = document.getElementById('signinOverlay');
+const signinClose       = document.getElementById('signinClose');
+const tabSignIn         = document.getElementById('tabSignIn');
+const tabSignUp         = document.getElementById('tabSignUp');
+const signinForm        = document.getElementById('signinForm');
+const signupForm        = document.getElementById('signupForm');
+const signinError       = document.getElementById('signinError');
+const signinEmail       = document.getElementById('signinEmail');
+const signinPassword    = document.getElementById('signinPassword');
+const signupName        = document.getElementById('signupName');
+const signupEmail       = document.getElementById('signupEmail');
+const signupPassword    = document.getElementById('signupPassword');
+const signupPassword2   = document.getElementById('signupPassword2');
+const googleBtn         = document.getElementById('googleBtn');
+const googleBtn2        = document.getElementById('googleBtn2');
+const forgotBtn         = document.getElementById('forgotBtn');
 
-function setCompleteBtnLoading(state){
-  if(!completePaymentBtn) return;
-  if(state){
-    completePaymentBtn.disabled = true;
-    if(completeBtnSpin) completeBtnSpin.style.display = 'inline-block';
-    if(completeBtnText) completeBtnText.textContent = 'Processing...';
-  }else{
-    completePaymentBtn.disabled = false;
-    if(completeBtnSpin) completeBtnSpin.style.display = 'none';
-    if(completeBtnText) completeBtnText.textContent = 'Complete Payment';
+const profileBox        = document.getElementById('profileBox');
+const avatarBtn         = document.getElementById('avatarBtn');
+const profileMenu       = document.getElementById('profileMenu');
+const profileEmail      = document.getElementById('profileEmail');
+const viewProfileBtn    = document.getElementById('viewProfileBtn');
+const logoutBtn         = document.getElementById('logoutBtn');
+
+const teamNotSigned     = document.getElementById('teamNotSigned');
+const teamSection       = document.getElementById('teamSection');
+const teamInfo          = document.getElementById('teamInfo');
+const teamActions       = document.getElementById('teamActions');
+const createTeamBtn     = document.getElementById('createTeamBtn');
+const joinTeamBtn       = document.getElementById('joinTeamBtn');
+const createTeamBox     = document.getElementById('createTeamBox');
+const createTeamName    = document.getElementById('createTeamName');
+const doCreateTeam      = document.getElementById('doCreateTeam');
+const cancelCreateTeam  = document.getElementById('cancelCreateTeam');
+const joinTeamBox       = document.getElementById('joinTeamBox');
+const joinCodeInput     = document.getElementById('joinCodeInput');
+const doJoinTeam        = document.getElementById('doJoinTeam');
+const cancelJoinTeam    = document.getElementById('cancelJoinTeam');
+
+const roundsTabBlock    = document.getElementById('roundsTab');
+const roundsNotSigned   = document.getElementById('roundsNotSigned');
+const roundsSection     = document.getElementById('roundsSection');
+const roundsLockedNote  = document.getElementById('roundsLockedNote');
+const r1Form            = document.getElementById('r1Form');
+const r1Problem         = document.getElementById('r1Problem');
+const r1Solution        = document.getElementById('r1Solution');
+const r1Api             = document.getElementById('r1Api');
+const r1Save            = document.getElementById('r1Save');
+const r2Form            = document.getElementById('r2Form');
+const r2Repo            = document.getElementById('r2Repo');
+const r2Demo            = document.getElementById('r2Demo');
+const r2Notes           = document.getElementById('r2Notes');
+const r2Save            = document.getElementById('r2Save');
+const r3Form            = document.getElementById('r3Form');
+const r3Slides          = document.getElementById('r3Slides');
+const r3Notes           = document.getElementById('r3Notes');
+const r3Save            = document.getElementById('r3Save');
+
+const leaderboardBody   = document.getElementById('leaderboardBody');
+
+const judgeTabBlock     = document.getElementById('judgeTab');
+const judgeNotAllowed   = document.getElementById('judgeNotAllowed');
+const judgeSection      = document.getElementById('judgeSection');
+const judgeRound        = document.getElementById('judgeRound');
+const judgeHead         = document.getElementById('judgeHead');
+const judgeBody         = document.getElementById('judgeBody');
+const saveScoresBtn     = document.getElementById('saveScoresBtn');
+
+/* ---------------- Tabs ---------------- */
+tabs.forEach(t=>{
+  t.addEventListener('click', ()=>{
+    tabs.forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    Object.values(tabBlocks).forEach(b=> b.classList.add('hidden'));
+    const id = t.getAttribute('data-tab');
+    tabBlocks[id].classList.remove('hidden');
+  });
+});
+
+/* ---------------- Countdown ---------------- */
+function renderCountdown(){
+  const now = new Date();
+  let diff = START_AT - now;
+  if (diff <= 0) {
+    countdownEl.innerHTML = `<span>Started</span>`;
+    return;
+  }
+  const d = Math.floor(diff / (1000*60*60*24));
+  diff -= d*24*60*60*1000;
+  const h = Math.floor(diff / (1000*60*60));
+  diff -= h*60*60*1000;
+  const m = Math.floor(diff / (1000*60));
+  diff -= m*60*1000;
+  const s = Math.floor(diff / 1000);
+  countdownEl.innerHTML = `
+    <span>${d}d</span><span>${h}h</span><span>${m}m</span><span>${s}s</span>
+  `;
+}
+renderCountdown();
+setInterval(renderCountdown, 1000);
+
+/* ---------------- Toast ---------------- */
+function toast(msg, ms=2500){
+  toastEl.textContent = msg;
+  toastEl.style.display = 'block';
+  setTimeout(()=> toastEl.style.display = 'none', ms);
+}
+
+/* ---------------- Auth modal ---------------- */
+openSignin?.addEventListener('click', ()=>{
+  signinOverlay.classList.remove('hidden');
+  showSignIn();
+});
+signinClose?.addEventListener('click', ()=> signinOverlay.classList.add('hidden'));
+signinOverlay?.addEventListener('click', (e)=>{
+  if(e.target === signinOverlay) signinOverlay.classList.add('hidden');
+});
+
+tabSignIn?.addEventListener('click', showSignIn);
+tabSignUp?.addEventListener('click', showSignUp);
+
+function showSignIn(){
+  tabSignIn.classList.add('active');
+  tabSignUp.classList.remove('active');
+  signinForm.classList.remove('hidden');
+  signupForm.classList.add('hidden');
+  signinError.style.display = 'none';
+}
+function showSignUp(){
+  tabSignUp.classList.add('active');
+  tabSignIn.classList.remove('active');
+  signupForm.classList.remove('hidden');
+  signinForm.classList.add('hidden');
+  signinError.style.display = 'none';
+}
+
+/* ---------------- Auth handlers ---------------- */
+signinForm?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const email = signinEmail.value.trim();
+  const pass  = signinPassword.value;
+  if(!email.endsWith('@klu.ac.in')){
+    return showSigninError("Only @klu.ac.in mail is allowed");
+  }
+  try{
+    await signInWithEmailAndPassword(auth, email, pass);
+    signinOverlay.classList.add('hidden');
+  }catch(err){
+    showSigninError(err.message);
+  }
+});
+signupForm?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const name  = signupName.value.trim();
+  const email = signupEmail.value.trim();
+  const p1 = signupPassword.value;
+  const p2 = signupPassword2.value;
+  if(!email.endsWith('@klu.ac.in')){
+    return showSigninError("Only @klu.ac.in mail is allowed");
+  }
+  if(p1.length < 6) return showSigninError('Password must be ≥ 6 chars');
+  if(p1 !== p2) return showSigninError('Passwords do not match');
+  try{
+    const cred = await createUserWithEmailAndPassword(auth, email, p1);
+    if(name) await updateProfile(cred.user, { displayName: name });
+    signinOverlay.classList.add('hidden');
+  }catch(err){
+    showSigninError(err.message);
+  }
+});
+forgotBtn?.addEventListener('click', async ()=>{
+  const email = prompt("Enter your @klu.ac.in email:");
+  if(!email) return;
+  if(!email.endsWith('@klu.ac.in')){
+    alert("Only @klu.ac.in mail is allowed"); return;
+  }
+  try{
+    await sendPasswordResetEmail(auth, email);
+    alert("Password reset email sent");
+  }catch(err){
+    alert(err.message);
+  }
+});
+function showSigninError(msg){
+  signinError.textContent = msg;
+  signinError.style.display = 'block';
+}
+
+googleBtn?.addEventListener('click', onGoogleAuth);
+googleBtn2?.addEventListener('click', onGoogleAuth);
+async function onGoogleAuth(){
+  const provider = new GoogleAuthProvider();
+  try{
+    const res = await signInWithPopup(auth, provider);
+    if(!res.user.email.endsWith('@klu.ac.in')){
+      await signOut(auth);
+      showSigninError("Only @klu.ac.in mail is allowed");
+      return;
+    }
+    signinOverlay.classList.add('hidden');
+  }catch(err){
+    showSigninError(err.message);
   }
 }
 
-payBtn.addEventListener('click', () => {
-  const form = document.getElementById('regForm');
-  if (!form.reportValidity()) return;
-
-  formDataCache = collectFormData();
-
-  // build UPI deep link & QR
-  const upiUrl = buildUpiUrl(UPI_ID, UPI_NAME, AMOUNT_RUPEES);
-  upiTextEl.textContent = `${UPI_ID} • ${UPI_NAME}`;
-  payQRContainer.innerHTML = "";
-  new QRCode(payQRContainer, {
-    text: upiUrl,
-    width: 200,
-    height: 200,
-    colorDark : "#ffffff",
-    colorLight : "transparent",
-    correctLevel : QRCode.CorrectLevel.H
-  });
-
-  paymentOverlay.style.display = 'flex';
+/* ---------------- Avatar menu ---------------- */
+avatarBtn?.addEventListener('click', ()=>{
+  profileMenu.classList.toggle('hidden');
+});
+document.addEventListener('click', (e)=>{
+  if(!profileBox.contains(e.target)){
+    profileMenu.classList.add('hidden');
+  }
+});
+logoutBtn?.addEventListener('click', async ()=>{
+  await signOut(auth);
+});
+viewProfileBtn?.addEventListener('click', ()=>{
+  alert(`Name: ${user?.displayName || '(not set)'}\nEmail: ${user?.email}`);
+  profileMenu.classList.add('hidden');
 });
 
-closePayment.addEventListener('click', ()=> paymentOverlay.style.display = 'none');
-paymentOverlay.addEventListener('click', (e)=> {
-  if(e.target === paymentOverlay) paymentOverlay.style.display = 'none';
-});
-
-closeSuccess.addEventListener('click', ()=> successOverlay.style.display = 'none');
-okSuccess.addEventListener('click', ()=> successOverlay.style.display = 'none');
-successOverlay.addEventListener('click', (e)=> {
-  if(e.target === successOverlay) successOverlay.style.display = 'none';
-});
-
-/* ---------- Helpers ---------- */
-function collectFormData(){
-  return {
-    name:  document.getElementById('name').value.trim(),
-    regno: document.getElementById('regno').value.trim(),
-    year:  document.getElementById('year').value,
-    dept:  document.getElementById('dept').value,
-    email: document.getElementById('email').value.trim(),
-    phone: document.getElementById('phone').value.trim(),
-    amount: AMOUNT_RUPEES
-  };
-}
-function buildUpiUrl(upiId, name, amount){
-  return `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
-}
-function generateToken(regno){
-  const suffix = Math.floor(Math.random()*900+100);
-  return `AMZ-${regno}-${suffix}`;
-}
-
-/* Payment Form Submit */
-paymentForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  if (submitting) return;
-  submitting = true;
-  setCompleteBtnLoading(true);
-
-  const txnId      = document.getElementById('txnId').value.trim();
-  const payerName  = document.getElementById('payerName').value.trim();
-  const paidAmount = Number(document.getElementById('paidAmount').value || AMOUNT_RUPEES);
-
-  if(!txnId){
-    alert("Please enter your Transaction / UTR ID.");
-    submitting = false;
-    setCompleteBtnLoading(false);
+/* ---------------- Auth state ---------------- */
+onAuthStateChanged(auth, async (u)=>{
+  user = u;
+  if(user && user.email && !user.email.endsWith('@klu.ac.in')){
+    await signOut(auth);
     return;
   }
 
+  if(user){
+    openSignin?.classList.add('hidden');
+    profileBox.classList.remove('hidden');
+    profileEmail.textContent = user.email;
+    avatarBtn.textContent = (user.displayName?.[0] || user.email[0]).toUpperCase();
+  }else{
+    openSignin?.classList.remove('hidden');
+    profileBox.classList.add('hidden');
+  }
+
+  await loadEventConfig();
+  await loadMyTeam();
+  await renderTeamUI();
+  await renderRoundsUI();
+  await buildLeaderboard();
+  setupJudgeUI();
+});
+
+/* ---------------- Event config ---------------- */
+async function loadEventConfig(){
   try{
-    const tokenId = generateToken(formDataCache.regno);
-    const paidAt  = new Date().toISOString();
-    const participantNo = await allocateParticipantNumber();
+    const ref = doc(db, "events", EVENT_ID, "meta", "config");
+    const snap = await getDoc(ref);
+    if(snap.exists()){
+      eventConfig = Object.assign(eventConfig, snap.data());
+    }
+  }catch(err){
+    console.error("config load", err);
+  }
+}
 
-    await savePaymentToFirestore({
-      status: "submitted",
-      amount: paidAmount,
-      paid_at: paidAt,
-      token: tokenId,
-      participant_no: participantNo,
-      transaction_id: txnId,
-      payer_name: payerName || null,
-      upi_id: UPI_ID,
-      ...formDataCache
-    });
+/* ---------------- Team logic ---------------- */
+async function loadMyTeam(){
+  myTeamDoc = null;
+  if(!user) return;
+  const teamsRef = collection(db, "events", EVENT_ID, "teams");
+  const qy = query(teamsRef, where("members", "array-contains", user.email));
+  const snap = await getDocs(qy);
+  if(!snap.empty){
+    const d = snap.docs[0];
+    myTeamDoc = { id: d.id, ...d.data() };
+  }
+}
+async function renderTeamUI(){
+  if(!user){
+    teamNotSigned.classList.remove('hidden');
+    teamSection.classList.add('hidden');
+    return;
+  }
+  teamNotSigned.classList.add('hidden');
+  teamSection.classList.remove('hidden');
 
-    paymentOverlay.style.display = 'none';
-    successOverlay.style.display = 'flex';
-    document.getElementById('regForm').reset();
-    paymentForm.reset();
+  // hide forms by default
+  createTeamBox.classList.add('hidden');
+  joinTeamBox.classList.add('hidden');
+
+  if(myTeamDoc){
+    teamActions.classList.add('hidden');
+    teamInfo.classList.remove('hidden');
+    teamInfo.innerHTML = renderTeamInfoHtml(myTeamDoc);
+    attachTeamActionButtons();
+  }else{
+    teamInfo.classList.add('hidden');
+    teamActions.classList.remove('hidden');
+  }
+}
+function renderTeamInfoHtml(t){
+  const locked = t.locked ? `<span class="pill locked">locked</span>` : '';
+  const joinCode = t.locked ? '' : `<div class="muted">Join Code: <span class="inline-code">${t.joinCode}</span></div>`;
+  const meIsOwner = (t.createdBy === user?.email);
+  const canLock = !t.locked && t.members?.length >= (eventConfig.minTeamSize || 2);
+  const canUnlock = meIsOwner && t.locked;
+
+  return `
+    <div style="margin-bottom:10px;">
+      <h3>${t.name} ${locked}</h3>
+      <div class="muted">Team ID: ${t.id}</div>
+      ${joinCode}
+    </div>
+
+    <div><strong>Members (${t.members?.length || 0})</strong></div>
+    <ul style="margin-top:6px;">
+      ${(t.members||[]).map(m=> `<li>${m}${m===t.createdBy ? ' <span class="pill">owner</span>':''}</li>`).join('')}
+    </ul>
+
+    <div style="margin-top:10px;">
+      ${(!t.locked && meIsOwner) ? `<button class="btn btn-primary" id="lockTeamBtn">Lock Team</button>` : ''}
+      ${(canUnlock) ? `<button class="btn btn-outline" id="unlockTeamBtn">Unlock</button>` : ''}
+      ${(!t.locked && meIsOwner) ? `<button class="btn btn-danger" id="leaveTeamBtn" disabled>Owner can't leave</button>` : `<button class="btn btn-outline" id="leaveTeamBtn">Leave Team</button>`}
+    </div>
+  `;
+}
+function attachTeamActionButtons(){
+  const lockTeamBtn = document.getElementById('lockTeamBtn');
+  const unlockTeamBtn = document.getElementById('unlockTeamBtn');
+  const leaveTeamBtn = document.getElementById('leaveTeamBtn');
+  lockTeamBtn?.addEventListener('click', lockTeam);
+  unlockTeamBtn?.addEventListener('click', unlockTeam);
+  leaveTeamBtn?.addEventListener('click', leaveTeam);
+}
+async function lockTeam(){
+  if(!myTeamDoc) return;
+  if(!confirm("Lock team? You cannot add more members.")) return;
+  try{
+    const ref = doc(db, "events", EVENT_ID, "teams", myTeamDoc.id);
+    await updateDoc(ref, { locked: true, lockedAt: serverTimestamp() });
+    toast("Team locked");
+    await loadMyTeam();
+    await renderTeamUI();
+    await renderRoundsUI();
+  }catch(err){ console.error(err); toast("Failed to lock"); }
+}
+async function unlockTeam(){
+  if(!myTeamDoc) return;
+  if(myTeamDoc.createdBy !== user.email){
+    toast("Only owner can unlock"); return;
+  }
+  if(!confirm("Unlock team?")) return;
+  try{
+    const ref = doc(db, "events", EVENT_ID, "teams", myTeamDoc.id);
+    await updateDoc(ref, { locked: false });
+    toast("Unlocked");
+    await loadMyTeam();
+    await renderTeamUI();
+  }catch(err){ console.error(err); toast("Failed to unlock"); }
+}
+async function leaveTeam(){
+  if(!myTeamDoc) return;
+  if(myTeamDoc.createdBy === user.email){
+    toast("Owner cannot leave. Transfer ownership (not implemented) or delete team.");
+    return;
+  }
+  if(myTeamDoc.locked){
+    toast("Locked team cannot be left. Contact organizers.");
+    return;
+  }
+  if(!confirm("Leave this team?")) return;
+  try{
+    const ref = doc(db, "events", EVENT_ID, "teams", myTeamDoc.id);
+    const newMembers = (myTeamDoc.members||[]).filter(m => m !== user.email);
+    await updateDoc(ref, { members: newMembers });
+    toast("Left team");
+    await loadMyTeam();
+    await renderTeamUI();
+    await renderRoundsUI();
   }catch(err){
     console.error(err);
-    alert("Something went wrong while saving your payment. Please try again or contact the organizers.");
-  }finally{
-    submitting = false;
-    setCompleteBtnLoading(false);
+    toast("Failed to leave");
+  }
+}
+
+/* Create / Join team flows */
+createTeamBtn?.addEventListener('click', ()=>{
+  createTeamBox.classList.remove('hidden');
+  joinTeamBox.classList.add('hidden');
+});
+cancelCreateTeam?.addEventListener('click', ()=> createTeamBox.classList.add('hidden'));
+joinTeamBtn?.addEventListener('click', ()=>{
+  joinTeamBox.classList.remove('hidden');
+  createTeamBox.classList.add('hidden');
+});
+cancelJoinTeam?.addEventListener('click', ()=> joinTeamBox.classList.add('hidden'));
+
+doCreateTeam?.addEventListener('click', async ()=>{
+  const name = createTeamName.value.trim();
+  if(!name) return toast("Enter team name");
+  try{
+    // ensure not in a team
+    await loadMyTeam();
+    if(myTeamDoc) return toast("You already are in a team");
+
+    const joinCode = genCode(6);
+    const ref = await addDoc(collection(db, "events", EVENT_ID, "teams"), {
+      name,
+      createdAt: serverTimestamp(),
+      createdBy: user.email,
+      members: [user.email],
+      locked: false,
+      joinCode,
+      r1: null, r2: null, r3: null
+    });
+    toast("Team created");
+    await loadMyTeam();
+    await renderTeamUI();
+    await renderRoundsUI();
+  }catch(err){
+    console.error(err); toast("Failed to create team");
   }
 });
 
-/* ---------- Firestore ---------- */
-async function savePaymentToFirestore(data){
-  const colRef = collection(db, "event_registrations", EVENT_ID, "payments");
-  const docRef = doc(colRef, data.regno);
-  await setDoc(docRef, {
-    ...data,
-    timestamp: serverTimestamp()
+doJoinTeam?.addEventListener('click', async ()=>{
+  const code = joinCodeInput.value.trim().toUpperCase();
+  if(!code) return toast("Enter join code");
+  try{
+    await loadMyTeam();
+    if(myTeamDoc) return toast("You're already in a team");
+
+    // find team by code
+    const colRef = collection(db, "events", EVENT_ID, "teams");
+    const qy = query(colRef, where("joinCode", "==", code));
+    const snap = await getDocs(qy);
+    if(snap.empty){ toast("Invalid code"); return; }
+    const docSnap = snap.docs[0];
+    const t = { id: docSnap.id, ...docSnap.data() };
+    if(t.locked){ toast("Team is locked"); return; }
+    const members = t.members || [];
+    if(members.includes(user.email)){ toast("Already in that team"); return; }
+    const maxSize = eventConfig.maxTeamSize || 4;
+    if(members.length >= maxSize){ toast("Team is full"); return; }
+
+    const ref = doc(db, "events", EVENT_ID, "teams", t.id);
+    await updateDoc(ref, { members: [...members, user.email] });
+
+    toast("Joined team");
+    await loadMyTeam();
+    await renderTeamUI();
+    await renderRoundsUI();
+  }catch(err){
+    console.error(err); toast("Join failed");
+  }
+});
+
+function genCode(n){
+  return Math.random().toString(36).substring(2, 2+n).toUpperCase();
+}
+
+/* ---------------- Rounds & Submissions ---------------- */
+async function renderRoundsUI(){
+  if(!user){
+    roundsNotSigned.classList.remove('hidden');
+    roundsSection.classList.add('hidden');
+    return;
+  }
+  if(!myTeamDoc){
+    roundsNotSigned.classList.remove('hidden');
+    roundsSection.classList.add('hidden');
+    roundsNotSigned.textContent = "Join a team to submit.";
+    return;
+  }
+  roundsNotSigned.classList.add('hidden');
+  roundsSection.classList.remove('hidden');
+
+  // locked status
+  roundsLockedNote.classList.toggle('hidden', !myTeamDoc.locked);
+
+  // fill forms
+  await loadMyTeam(); // refetch to ensure the latest
+  r1Problem.value  = myTeamDoc?.r1?.problem  || "";
+  r1Solution.value = myTeamDoc?.r1?.solution || "";
+  r1Api.value      = myTeamDoc?.r1?.api      || "";
+
+  r2Repo.value   = myTeamDoc?.r2?.repo  || "";
+  r2Demo.value   = myTeamDoc?.r2?.demo  || "";
+  r2Notes.value  = myTeamDoc?.r2?.notes || "";
+
+  r3Slides.value = myTeamDoc?.r3?.slides || "";
+  r3Notes.value  = myTeamDoc?.r3?.notes  || "";
+}
+
+r1Form?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  if(!myTeamDoc) return;
+  try{
+    const ref = doc(db, "events", EVENT_ID, "teams", myTeamDoc.id);
+    await updateDoc(ref, {
+      r1: {
+        problem: r1Problem.value.trim(),
+        solution: r1Solution.value.trim(),
+        api: r1Api.value.trim(),
+        updatedAt: serverTimestamp()
+      }
+    });
+    toast("Round 1 saved");
+  }catch(err){ console.error(err); toast("Save failed"); }
+});
+r2Form?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  if(!myTeamDoc) return;
+  try{
+    const ref = doc(db, "events", EVENT_ID, "teams", myTeamDoc.id);
+    await updateDoc(ref, {
+      r2: {
+        repo: r2Repo.value.trim(),
+        demo: r2Demo.value.trim(),
+        notes: r2Notes.value.trim(),
+        updatedAt: serverTimestamp()
+      }
+    });
+    toast("Round 2 saved");
+  }catch(err){ console.error(err); toast("Save failed"); }
+});
+r3Form?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  if(!myTeamDoc) return;
+  try{
+    const ref = doc(db, "events", EVENT_ID, "teams", myTeamDoc.id);
+    await updateDoc(ref, {
+      r3: {
+        slides: r3Slides.value.trim(),
+        notes: r3Notes.value.trim(),
+        updatedAt: serverTimestamp()
+      }
+    });
+    toast("Round 3 saved");
+  }catch(err){ console.error(err); toast("Save failed"); }
+});
+
+/* ---------------- Leaderboard ---------------- */
+async function buildLeaderboard(){
+  leaderboardBody.innerHTML = '';
+  // fetch all teams
+  const teamsRef = collection(db, "events", EVENT_ID, "teams");
+  const snap = await getDocs(teamsRef);
+  const teams = [];
+  snap.forEach(d => teams.push({ id: d.id, ...d.data() }));
+
+  // fetch all scores
+  const scoresRef = collection(db, "events", EVENT_ID, "scores");
+  const scoresSnap = await getDocs(scoresRef);
+  const scores = {};
+  scoresSnap.forEach(s=>{
+    const d = s.data();
+    // store scores[teamId] = { r1:{}, r2:{}, r3:{}, total }
+    if(!scores[d.teamId]) scores[d.teamId] = { r1:[], r2:[], r3:[] };
+    if(d.round === 1) scores[d.teamId].r1.push(d);
+    if(d.round === 2) scores[d.teamId].r2.push(d);
+    if(d.round === 3) scores[d.teamId].r3.push(d);
+  });
+
+  const rows = teams.map(t=>{
+    const sc = scores[t.id] || { r1:[], r2:[], r3:[] };
+    const r1 = avgScore(sc.r1);
+    const r2 = avgScore(sc.r2);
+    const r3 = avgScore(sc.r3);
+    const total = r1 + r2 + r3;
+    return {
+      team: t.name,
+      r1, r2, r3,
+      total
+    };
+  });
+
+  rows.sort((a,b)=> b.total - a.total);
+
+  rows.forEach((r, idx)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${idx+1}</td>
+      <td>${r.team}</td>
+      <td>${r.r1}</td>
+      <td>${r.r2}</td>
+      <td>${r.r3}</td>
+      <td><strong>${r.total}</strong></td>
+    `;
+    leaderboardBody.appendChild(tr);
   });
 }
-async function allocateParticipantNumber(){
-  const counterRef = doc(db, "event_registrations", EVENT_ID);
-  return await runTransaction(db, async (transaction)=>{
-    const docSnap = await transaction.get(counterRef);
-    let current = 0;
-    if(docSnap.exists()){
-      current = docSnap.data().counter || 0;
+function avgScore(arr){
+  if(!arr.length) return 0;
+  const sums = arr.map(x => Number(x.total||0));
+  const total = sums.reduce((a,b)=> a+b, 0);
+  return Math.round((total / arr.length) * 100) / 100;
+}
+
+/* ---------------- Judge Console ---------------- */
+function setupJudgeUI(){
+  if(!user){ showJudge(false); return; }
+  isJudge = eventConfig.judges?.includes(user.email);
+  showJudge(isJudge);
+  if(!isJudge) return;
+  judgeRound.addEventListener('change', loadJudgeTable);
+  loadJudgeTable();
+  saveScoresBtn.addEventListener('click', saveScores);
+}
+function showJudge(flag){
+  if(flag){
+    judgeNotAllowed.classList.add('hidden');
+    judgeSection.classList.remove('hidden');
+  }else{
+    judgeNotAllowed.classList.remove('hidden');
+    judgeSection.classList.add('hidden');
+  }
+}
+async function loadJudgeTable(){
+  const r = Number(judgeRound.value);
+  // table head by round
+  if(r === 1){
+    judgeHead.innerHTML = `
+      <tr>
+        <th>#</th>
+        <th>Team</th>
+        <th>Problem clarity (5)</th>
+        <th>Feasibility & creativity (5)</th>
+        <th>API relevance (5)</th>
+        <th>Total</th>
+      </tr>
+    `;
+  }else if(r === 2){
+    judgeHead.innerHTML = `
+      <tr>
+        <th>#</th>
+        <th>Team</th>
+        <th>API integration (20)</th>
+        <th>Functionality (20)</th>
+        <th>UI/UX (10)</th>
+        <th>Code quality (5)</th>
+        <th>Total</th>
+      </tr>
+    `;
+  }else{
+    judgeHead.innerHTML = `
+      <tr>
+        <th>#</th>
+        <th>Team</th>
+        <th>Explanation & demo (10)</th>
+        <th>Creativity & impact (10)</th>
+        <th>Time mgmt (5)</th>
+        <th>Team collab / solo (5)</th>
+        <th>Total</th>
+      </tr>
+    `;
+  }
+
+  judgeBody.innerHTML = '';
+
+  // load teams locked only (submitted and ready), or all
+  const teamsRef = collection(db, "events", EVENT_ID, "teams");
+  const snap = await getDocs(teamsRef);
+  const teams = [];
+  snap.forEach(d => teams.push({ id: d.id, ...d.data() }));
+  teams.sort((a,b)=> a.name.localeCompare(b.name));
+
+  // load my previous scores for this round
+  const myScores = {};
+  const scoresRef = collection(db, "events", EVENT_ID, "scores");
+  const qy = query(scoresRef, where("round","==", r), where("judge","==", user.email));
+  const scSnap = await getDocs(qy);
+  scSnap.forEach(s => myScores[s.data().teamId] = s.data());
+
+  teams.forEach((t, idx)=>{
+    const sc = myScores[t.id] || {};
+    const tr = document.createElement('tr');
+    if(r === 1){
+      tr.innerHTML = `
+        <td>${idx+1}</td>
+        <td>${t.name}</td>
+        <td><input class="score-input" data-k="pc" data-team="${t.id}" value="${sc.pc||0}" max="5" type="number" min="0"></td>
+        <td><input class="score-input" data-k="fc" data-team="${t.id}" value="${sc.fc||0}" max="5" type="number" min="0"></td>
+        <td><input class="score-input" data-k="ar" data-team="${t.id}" value="${sc.ar||0}" max="5" type="number" min="0"></td>
+        <td class="total-cell" data-team="${t.id}">${sc.total||0}</td>
+      `;
+    }else if(r === 2){
+      tr.innerHTML = `
+        <td>${idx+1}</td>
+        <td>${t.name}</td>
+        <td><input class="score-input" data-k="ai" data-team="${t.id}" value="${sc.ai||0}" max="20" type="number" min="0"></td>
+        <td><input class="score-input" data-k="fn" data-team="${t.id}" value="${sc.fn||0}" max="20" type="number" min="0"></td>
+        <td><input class="score-input" data-k="ux" data-team="${t.id}" value="${sc.ux||0}" max="10" type="number" min="0"></td>
+        <td><input class="score-input" data-k="cq" data-team="${t.id}" value="${sc.cq||0}" max="5" type="number" min="0"></td>
+        <td class="total-cell" data-team="${t.id}">${sc.total||0}</td>
+      `;
+    }else{
+      tr.innerHTML = `
+        <td>${idx+1}</td>
+        <td>${t.name}</td>
+        <td><input class="score-input" data-k="ed" data-team="${t.id}" value="${sc.ed||0}" max="10" type="number" min="0"></td>
+        <td><input class="score-input" data-k="ci" data-team="${t.id}" value="${sc.ci||0}" max="10" type="number" min="0"></td>
+        <td><input class="score-input" data-k="tm" data-team="${t.id}" value="${sc.tm||0}" max="5" type="number" min="0"></td>
+        <td><input class="score-input" data-k="tc" data-team="${t.id}" value="${sc.tc||0}" max="5" type="number" min="0"></td>
+        <td class="total-cell" data-team="${t.id}">${sc.total||0}</td>
+      `;
     }
-    const next = current + 1;
-    transaction.set(counterRef, { counter: next }, { merge: true });
-    return next;
+    judgeBody.appendChild(tr);
+  });
+
+  judgeBody.querySelectorAll('.score-input').forEach(inp=>{
+    inp.addEventListener('input', recomputeRowTotal);
   });
 }
+function recomputeRowTotal(e){
+  const teamId = e.target.getAttribute('data-team');
+  const r = Number(judgeRound.value);
+  const inputs = [...judgeBody.querySelectorAll(`.score-input[data-team="${teamId}"]`)];
+  let sum = 0;
+  inputs.forEach(i => sum += Number(i.value||0));
+  const cell = judgeBody.querySelector(`.total-cell[data-team="${teamId}"]`);
+  cell.textContent = sum;
+}
+async function saveScores(){
+  const r = Number(judgeRound.value);
+  const rows = {};
+  judgeBody.querySelectorAll('.score-input').forEach(inp=>{
+    const teamId = inp.getAttribute('data-team');
+    const k = inp.getAttribute('data-k');
+    const v = Number(inp.value);
+    rows[teamId] = rows[teamId] || {};
+    rows[teamId][k] = v;
+  });
+
+  // compute totals and write
+  for(const teamId of Object.keys(rows)){
+    const data = rows[teamId];
+    const total = Object.values(data).reduce((a,b)=> a+b, 0);
+    await setDoc(doc(db, "events", EVENT_ID, "scores", `${teamId}_${user.email}_r${r}`), {
+      teamId,
+      judge: user.email,
+      round: r,
+      ...data,
+      total,
+      updatedAt: serverTimestamp()
+    }, { merge:true });
+  }
+  toast("Scores saved");
+  await buildLeaderboard();
+}
+
+/* ---------------- Utils ---------------- */
+
 </script>
 </body>
 </html>

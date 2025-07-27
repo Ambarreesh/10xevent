@@ -145,8 +145,11 @@
     </div>
 
     <!-- Auth -->
-    <div id="authBox">
+    <div id="authBox" style="display:flex; align-items:center; gap:8px;">
       <button class="btn btn-outline" id="openSignin">Sign in</button>
+
+      <!-- NEW: visible logout button -->
+      <button class="btn btn-outline hidden" id="logoutTopBtn">Logout</button>
 
       <div id="profileBox" class="hidden" style="position:relative;">
         <button class="btn btn-outline" id="avatarBtn" style="width:38px;height:38px;border-radius:50%;padding:0;font-weight:700;">U</button>
@@ -173,8 +176,8 @@
   <section id="overviewTab" class="block glass">
     <h2>Event Overview</h2>
     <p>
-      **API Maze** is a Build‑an‑App challenge. Use any public API (OpenWeather, Google Books, Jokes API, etc.) to craft
-      something useful/fun in **8 hours**. You can participate in **teams of 2–4 members** (you all registered individually; now you’ll form your team here).
+      <strong>API Maze</strong> is a Build‑an‑App challenge. Use any public API (OpenWeather, Google Books, Jokes API, etc.) to craft
+      something useful/fun in <strong>8 hours</strong>. You can participate in <strong>teams of 2–4 members</strong> (you all registered individually; now you’ll form your team here).
     </p>
 
     <h3>Prizes & Credits</h3>
@@ -198,7 +201,7 @@
       </li>
       <li>
         <strong>Round 3 – Final Presentation & Demo (2 hours) — 30 marks</strong><br/>
-        Explanation & demo (10), Creativity & impact (10), Time mgmt (5), Team collaboration/Solo effort (5)
+        Explanation & demo (10), Creativity & impact (10), Time management (5), Team collaboration / Solo effort (5)
       </li>
     </ol>
   </section>
@@ -423,7 +426,7 @@ const START_AT   = new Date("2025-08-02T09:30:00+05:30"); // 9:30 AM IST
 /* ---------------- State ---------------- */
 let user = null;
 let eventConfig = { judges: [], minTeamSize: 2, maxTeamSize: 4 };
-let myTeamDoc = null;           // { id, data... }
+let myTeamDoc = null;
 let isJudge = false;
 
 /* ---------------- DOM ---------------- */
@@ -463,6 +466,7 @@ const profileMenu       = document.getElementById('profileMenu');
 const profileEmail      = document.getElementById('profileEmail');
 const viewProfileBtn    = document.getElementById('viewProfileBtn');
 const logoutBtn         = document.getElementById('logoutBtn');
+const logoutTopBtn      = document.getElementById('logoutTopBtn'); // NEW
 
 const teamNotSigned     = document.getElementById('teamNotSigned');
 const teamSection       = document.getElementById('teamSection');
@@ -479,7 +483,6 @@ const joinCodeInput     = document.getElementById('joinCodeInput');
 const doJoinTeam        = document.getElementById('doJoinTeam');
 const cancelJoinTeam    = document.getElementById('cancelJoinTeam');
 
-const roundsTabBlock    = document.getElementById('roundsTab');
 const roundsNotSigned   = document.getElementById('roundsNotSigned');
 const roundsSection     = document.getElementById('roundsSection');
 const roundsLockedNote  = document.getElementById('roundsLockedNote');
@@ -487,20 +490,16 @@ const r1Form            = document.getElementById('r1Form');
 const r1Problem         = document.getElementById('r1Problem');
 const r1Solution        = document.getElementById('r1Solution');
 const r1Api             = document.getElementById('r1Api');
-const r1Save            = document.getElementById('r1Save');
 const r2Form            = document.getElementById('r2Form');
 const r2Repo            = document.getElementById('r2Repo');
 const r2Demo            = document.getElementById('r2Demo');
 const r2Notes           = document.getElementById('r2Notes');
-const r2Save            = document.getElementById('r2Save');
 const r3Form            = document.getElementById('r3Form');
 const r3Slides          = document.getElementById('r3Slides');
 const r3Notes           = document.getElementById('r3Notes');
-const r3Save            = document.getElementById('r3Save');
 
 const leaderboardBody   = document.getElementById('leaderboardBody');
 
-const judgeTabBlock     = document.getElementById('judgeTab');
 const judgeNotAllowed   = document.getElementById('judgeNotAllowed');
 const judgeSection      = document.getElementById('judgeSection');
 const judgeRound        = document.getElementById('judgeRound');
@@ -657,6 +656,9 @@ document.addEventListener('click', (e)=>{
 logoutBtn?.addEventListener('click', async ()=>{
   await signOut(auth);
 });
+logoutTopBtn?.addEventListener('click', async ()=>{
+  await signOut(auth);
+});
 viewProfileBtn?.addEventListener('click', ()=>{
   alert(`Name: ${user?.displayName || '(not set)'}\nEmail: ${user?.email}`);
   profileMenu.classList.add('hidden');
@@ -673,11 +675,13 @@ onAuthStateChanged(auth, async (u)=>{
   if(user){
     openSignin?.classList.add('hidden');
     profileBox.classList.remove('hidden');
+    logoutTopBtn.classList.remove('hidden');   // show top logout
     profileEmail.textContent = user.email;
     avatarBtn.textContent = (user.displayName?.[0] || user.email[0]).toUpperCase();
   }else{
     openSignin?.classList.remove('hidden');
     profileBox.classList.add('hidden');
+    logoutTopBtn.classList.add('hidden');      // hide top logout
   }
 
   await loadEventConfig();
@@ -722,7 +726,6 @@ async function renderTeamUI(){
   teamNotSigned.classList.add('hidden');
   teamSection.classList.remove('hidden');
 
-  // hide forms by default
   createTeamBox.classList.add('hidden');
   joinTeamBox.classList.add('hidden');
 
@@ -740,7 +743,6 @@ function renderTeamInfoHtml(t){
   const locked = t.locked ? `<span class="pill locked">locked</span>` : '';
   const joinCode = t.locked ? '' : `<div class="muted">Join Code: <span class="inline-code">${t.joinCode}</span></div>`;
   const meIsOwner = (t.createdBy === user?.email);
-  const canLock = !t.locked && t.members?.length >= (eventConfig.minTeamSize || 2);
   const canUnlock = meIsOwner && t.locked;
 
   return `
@@ -799,7 +801,7 @@ async function unlockTeam(){
 async function leaveTeam(){
   if(!myTeamDoc) return;
   if(myTeamDoc.createdBy === user.email){
-    toast("Owner cannot leave. Transfer ownership (not implemented) or delete team.");
+    toast("Owner cannot leave. Contact organizers.");
     return;
   }
   if(myTeamDoc.locked){
@@ -837,12 +839,11 @@ doCreateTeam?.addEventListener('click', async ()=>{
   const name = createTeamName.value.trim();
   if(!name) return toast("Enter team name");
   try{
-    // ensure not in a team
     await loadMyTeam();
     if(myTeamDoc) return toast("You already are in a team");
 
     const joinCode = genCode(6);
-    const ref = await addDoc(collection(db, "events", EVENT_ID, "teams"), {
+    await addDoc(collection(db, "events", EVENT_ID, "teams"), {
       name,
       createdAt: serverTimestamp(),
       createdBy: user.email,
@@ -867,7 +868,6 @@ doJoinTeam?.addEventListener('click', async ()=>{
     await loadMyTeam();
     if(myTeamDoc) return toast("You're already in a team");
 
-    // find team by code
     const colRef = collection(db, "events", EVENT_ID, "teams");
     const qy = query(colRef, where("joinCode", "==", code));
     const snap = await getDocs(qy);
@@ -912,11 +912,9 @@ async function renderRoundsUI(){
   roundsNotSigned.classList.add('hidden');
   roundsSection.classList.remove('hidden');
 
-  // locked status
   roundsLockedNote.classList.toggle('hidden', !myTeamDoc.locked);
 
-  // fill forms
-  await loadMyTeam(); // refetch to ensure the latest
+  await loadMyTeam();
   r1Problem.value  = myTeamDoc?.r1?.problem  || "";
   r1Solution.value = myTeamDoc?.r1?.solution || "";
   r1Api.value      = myTeamDoc?.r1?.api      || "";
@@ -951,12 +949,12 @@ r2Form?.addEventListener('submit', async (e)=>{
   try{
     const ref = doc(db, "events", EVENT_ID, "teams", myTeamDoc.id);
     await updateDoc(ref, {
-      r2: {
-        repo: r2Repo.value.trim(),
-        demo: r2Demo.value.trim(),
-        notes: r2Notes.value.trim(),
-        updatedAt: serverTimestamp()
-      }
+        r2: {
+          repo: r2Repo.value.trim(),
+          demo: r2Demo.value.trim(),
+          notes: r2Notes.value.trim(),
+          updatedAt: serverTimestamp()
+        }
     });
     toast("Round 2 saved");
   }catch(err){ console.error(err); toast("Save failed"); }
@@ -980,19 +978,16 @@ r3Form?.addEventListener('submit', async (e)=>{
 /* ---------------- Leaderboard ---------------- */
 async function buildLeaderboard(){
   leaderboardBody.innerHTML = '';
-  // fetch all teams
   const teamsRef = collection(db, "events", EVENT_ID, "teams");
   const snap = await getDocs(teamsRef);
   const teams = [];
   snap.forEach(d => teams.push({ id: d.id, ...d.data() }));
 
-  // fetch all scores
   const scoresRef = collection(db, "events", EVENT_ID, "scores");
   const scoresSnap = await getDocs(scoresRef);
   const scores = {};
   scoresSnap.forEach(s=>{
     const d = s.data();
-    // store scores[teamId] = { r1:{}, r2:{}, r3:{}, total }
     if(!scores[d.teamId]) scores[d.teamId] = { r1:[], r2:[], r3:[] };
     if(d.round === 1) scores[d.teamId].r1.push(d);
     if(d.round === 2) scores[d.teamId].r2.push(d);
@@ -1005,11 +1000,7 @@ async function buildLeaderboard(){
     const r2 = avgScore(sc.r2);
     const r3 = avgScore(sc.r3);
     const total = r1 + r2 + r3;
-    return {
-      team: t.name,
-      r1, r2, r3,
-      total
-    };
+    return { team: t.name, r1, r2, r3, total };
   });
 
   rows.sort((a,b)=> b.total - a.total);
@@ -1055,7 +1046,6 @@ function showJudge(flag){
 }
 async function loadJudgeTable(){
   const r = Number(judgeRound.value);
-  // table head by round
   if(r === 1){
     judgeHead.innerHTML = `
       <tr>
@@ -1095,14 +1085,12 @@ async function loadJudgeTable(){
 
   judgeBody.innerHTML = '';
 
-  // load teams locked only (submitted and ready), or all
   const teamsRef = collection(db, "events", EVENT_ID, "teams");
   const snap = await getDocs(teamsRef);
   const teams = [];
   snap.forEach(d => teams.push({ id: d.id, ...d.data() }));
   teams.sort((a,b)=> a.name.localeCompare(b.name));
 
-  // load my previous scores for this round
   const myScores = {};
   const scoresRef = collection(db, "events", EVENT_ID, "scores");
   const qy = query(scoresRef, where("round","==", r), where("judge","==", user.email));
@@ -1151,7 +1139,6 @@ async function loadJudgeTable(){
 }
 function recomputeRowTotal(e){
   const teamId = e.target.getAttribute('data-team');
-  const r = Number(judgeRound.value);
   const inputs = [...judgeBody.querySelectorAll(`.score-input[data-team="${teamId}"]`)];
   let sum = 0;
   inputs.forEach(i => sum += Number(i.value||0));
@@ -1169,7 +1156,6 @@ async function saveScores(){
     rows[teamId][k] = v;
   });
 
-  // compute totals and write
   for(const teamId of Object.keys(rows)){
     const data = rows[teamId];
     const total = Object.values(data).reduce((a,b)=> a+b, 0);
@@ -1185,9 +1171,6 @@ async function saveScores(){
   toast("Scores saved");
   await buildLeaderboard();
 }
-
-/* ---------------- Utils ---------------- */
-
 </script>
 </body>
 </html>

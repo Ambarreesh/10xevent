@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>API MAZE – Registration | 10X Club KARE</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+
+<!-- QR Code -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+  :root{
+    --glass: rgba(255,255,255,0.08);
+    --glass-strong: rgba(255,255,255,0.15);
+    --border: rgba(255,255,255,0.18);
+    --white: #fff;
+    --accent: #1657ff;
+    --accent-2:#F2551D;
+    --bg: #000;
+    --radius: 24px;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg);
+    color: var(--white);
+    min-height:100vh;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(22,87,255,0.08) 0 60% , transparent 60%),
+      radial-gradient(circle at 90% 80%, rgba(242,85,29,0.08) 0 60% , transparent 60%);
+    background-attachment: fixed;
+    overflow-x:hidden;
+  }
+  .container{
+    max-width:1100px;
+    margin:0 auto;
+    padding:24px 16px 120px;
+  }
+  .glass{
+    background: var(--glass);
+    border:1px solid var(--border);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 40px rgba(0,0,0,.3);
+  }
+  header.hero{
+    display:flex;
+    gap:24px;
+    align-items:center;
+    padding:32px 28px;
+    margin:24px 0 40px;
+    position:relative;
+    overflow:hidden;
+    flex-wrap:wrap;
+  }
+  header.hero::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
+    transform:skewX(-20deg) translateX(-100%);
+    animation:shine 5s infinite;
+  }
+  @keyframes shine{
+    0%{ transform:skewX(-20deg) translateX(-120%); }
+    100%{ transform:skewX(-20deg) translateX(120%); }
+  }
+  .logos{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .logos img{
+    height:70px; object-fit:contain;
+    background: rgba(255,255,255,0.04);
+    border-radius:14px; padding:8px 12px;
+  }
+  .hero h1{
+    font-size:2.2rem; margin:0;
+  }
+  .tag{
+    display:inline-block;
+    margin-top:8px;
+    background:rgba(255,255,255,0.08);
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:0.9rem;
+    letter-spacing:1px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
+    gap:28px;
+    align-items:start;
+  }
+  .event-card{
+    padding:24px 22px;
+  }
+  .event-card h2{
+    margin:0 0 12px;
+    letter-spacing:.5px;
+  }
+  .event-meta{
+    color:#ddd;
+    margin:4px 0 12px;
+  }
+  form#regForm{
+    padding:32px 26px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+  label{
+    font-size:.9rem;
+    letter-spacing:.4px;
+    color:#e7e7e7;
+  }
+  input, select, textarea{
+    width:100%;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px;
+    color:#fff;
+    padding:12px 14px;
+    font-family:inherit;
+    outline:none;
+    transition:border .25s;
+  }
+  input:focus, select:focus, textarea:focus{
+    border-color: var(--accent);
+  }
+  .btn{
+    appearance:none;
+    border:none;
+    border-radius:999px;
+    padding:14px 24px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .25s;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+  .btn-primary{
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color:#fff;
+    box-shadow: 0 10px 20px rgba(22,87,255,.15);
+  }
+  .btn-primary:hover{ transform:translateY(-1px) scale(1.01); }
+  .btn-ghost{
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .price{
+    font-size:1.5rem;
+    font-weight:700;
+  }
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.7);
+    display:none; align-items:center; justify-content:center;
+    z-index:2000;
+    padding:20px;
+  }
+  .modal{
+    max-width:520px; width:100%;
+    padding:24px 22px 28px;
+    position:relative;
+  }
+  .modal h3{
+    margin:0 0 14px;
+    text-align:center;
+  }
+  .close-x{
+    position:absolute; right:14px; top:12px;
+    font-size:22px; cursor:pointer; opacity:.7;
+  }
+  .divider{
+    height:1px; background:rgba(255,255,255,0.07); margin:12px 0 16px;
+  }
+  .qrpay-box{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; margin:14px 0 18px;
+  }
+  .blob{
+    position:absolute; border-radius:50%;
+    filter: blur(80px); opacity:.06; z-index:-1;
+  }
+  .blob.b1{ width:380px; height:380px; top:-60px; left:-80px; background:#1657ff; animation:float 12s ease-in-out infinite; }
+  .blob.b2{ width:300px; height:300px; bottom:-40px; right:-80px; background:#F2551D; animation:float 14s ease-in-out infinite reverse; }
+  @keyframes float{
+    0%{ transform:translateY(0) translateX(0) scale(1);}
+    50%{ transform:translateY(-20px) translateX(10px) scale(1.05);}
+    100%{ transform:translateY(0) translateX(0) scale(1);}
+  }
+  @media(max-width:520px){
+    .hero h1{ font-size:1.8rem; }
+    form#regForm{ padding:24px 18px; }
+    .event-card{ padding:20px 18px; }
+  }
+
+  /* Spinner for Complete Payment button */
+  .btn-spinner{
+    display:none;
+    width:16px; height:16px;
+    border:2px solid rgba(255,255,255,.4);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:spin .6s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HERO -->
+  <header class="hero glass">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+
+    <div class="logos">
+      <img src="img/klu.png" alt="KARE">
+      <img src="img/image 26.png" alt="10X Club KARE">
+    </div>
+
+    <div>
+      <h1>API MAZE</h1>
+      <div class="tag">August 2, 2025 • KARE Campus</div>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- Event Info -->
+    <section class="event-card glass">
+      <h2>Event Details</h2>
+      <div class="event-meta">Organized by <strong>10X Club – KARE Student Chapter</strong></div>
+      <ul style="line-height:1.8;margin:0 0 18px 18px;">
+        <li>Build-an-App Challenge using API</li>
+        <li>3 or 4 members per Team</li>
+        <li>Limited seats</li>
+      </ul>
+
+      <div class="price">₹ 100</div>
+      <small style="opacity:.8;">(includes 1 (EE) Credit & certificate)</small>
+    </section>
+
+    <!-- Registration Form -->
+    <section class="glass">
+      <form id="regForm">
+        <h2 style="margin:0 0 16px;">Register Now</h2>
+
+        <div>
+          <label for="name">Full Name</label>
+          <input id="name" name="name" required />
+        </div>
+
+        <div>
+          <label for="regno">Register Number</label>
+          <input id="regno" name="regno" required />
+        </div>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <div style="flex:1 1 140px;">
+            <label for="year">Year</label>
+            <select id="year" name="year" required>
+              <option value="">Select</option>
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+              <option>4th Year</option>
+            </select>
+          </div>
+          <div style="flex:1 1 140px;">
+          <label for="dept">Department</label>
+            <select id="dept" name="dept" required>
+              <option value="">Select</option>
+              <option>IT</option>
+              <option>CSE</option>
+              <option>ECE</option>
+              <option>EEE</option>
+              <option>MECH</option>
+              <option>CIVIL</option>
+              <option>AIDS</option>
+              <option>AIML</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required />
+        </div>
+
+        <div>
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" type="tel" required />
+        </div>
+
+        <div>
+          <label>Amount</label>
+          <input value="₹ 100.00" disabled />
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-primary" id="payBtn">Pay Now</button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL (QR + Txn ID entry) -->
+<div class="modal-overlay" id="paymentOverlay">
+  <div class="modal glass" id="paymentCard">
+    <span class="close-x" id="closePayment">&times;</span>
+    <h3>Pay ₹100 via UPI</h3>
+    <div class="divider"></div>
+
+    <div class="qrpay-box">
+      <div id="payQR"></div>
+      <div style="opacity:.8; font-size:.9rem;" id="upiText"></div>
+    </div>
+
+    <form id="paymentForm" style="display:flex; flex-direction:column; gap:14px;">
+      <div>
+        <label for="txnId">Transaction / UTR ID (required)</label>
+        <input id="txnId" name="txnId" required placeholder="e.g., 3245XXXXXXXX" />
+      </div>
+      <div>
+        <label for="payerName">Payer Name (as shown in app)</label>
+        <input id="payerName" name="payerName" placeholder="Optional" />
+      </div>
+      <div>
+        <label for="paidAmount">Amount Paid</label>
+        <input id="paidAmount" name="paidAmount" type="number" value="100" />
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="completePaymentBtn">
+        <span class="btn-text">Complete Payment</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- SUCCESS POPUP -->
+<div class="modal-overlay" id="successOverlay">
+  <div class="modal glass">
+    <span class="close-x" id="closeSuccess">&times;</span>
+    <h3>Payment Submitted</h3>
+    <div class="divider"></div>
+    <p style="text-align:center; line-height:1.6;">
+      Thank you! You will get your entry pass through email soon.
+    </p>
+    <div style="display:flex; justify-content:center; margin-top:12px;">
+      <button class="btn btn-primary" id="okSuccess">OK</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+/* ---------- Firebase ---------- */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+import {
+  getFirestore, collection, doc, setDoc, serverTimestamp, runTransaction
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* your config */
+const firebaseConfig = {
+  apiKey: "AIzaSyCzCBr-sZ_XiA1qiHjy2Ks0RDUJqELXjkY",
+  authDomain: "xclub-ac88a.firebaseapp.com",
+  projectId: "xclub-ac88a",
+  storageBucket: "xclub-ac88a.firebasestorage.app",
+  messagingSenderId: "929300450378",
+  appId: "1:929300450378:web:7d3ed01c4f270c3a136ab3",
+  measurementId: "G-66T0PCEXT0"
+};
+
+const app = initializeApp(firebaseConfig);
+getAnalytics(app);
+const db = getFirestore(app);
+
+/* ---------- Constants ---------- */
+const EVENT_ID = "api-maze-2025";
+const AMOUNT_RUPEES = 100;
+
+/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+   >>>  REPLACE WITH YOUR DETAILS  <<<
+   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+*/
+const UPI_ID   = "your-upi-id@bank";     // <<-- CHANGE THIS
+const UPI_NAME = "10X Club - KARE";      // <<-- CHANGE THIS
+
+/* ---------- Elements ---------- */
+const payBtn           = document.getElementById('payBtn');
+const paymentOverlay   = document.getElementById('paymentOverlay');
+const closePayment     = document.getElementById('closePayment');
+const paymentForm      = document.getElementById('paymentForm');
+const successOverlay   = document.getElementById('successOverlay');
+const closeSuccess     = document.getElementById('closeSuccess');
+const okSuccess        = document.getElementById('okSuccess');
+const payQRContainer   = document.getElementById('payQR');
+const upiTextEl        = document.getElementById('upiText');
+const completePaymentBtn = document.getElementById('completePaymentBtn');
+const completeBtnText    = completePaymentBtn?.querySelector('.btn-text');
+const completeBtnSpin    = completePaymentBtn?.querySelector('.btn-spinner');
+
+let formDataCache = null;
+let submitting = false;
+
+function setCompleteBtnLoading(state){
+  if(!completePaymentBtn) return;
+  if(state){
+    completePaymentBtn.disabled = true;
+    if(completeBtnSpin) completeBtnSpin.style.display = 'inline-block';
+    if(completeBtnText) completeBtnText.textContent = 'Processing...';
+  }else{
+    completePaymentBtn.disabled = false;
+    if(completeBtnSpin) completeBtnSpin.style.display = 'none';
+    if(completeBtnText) completeBtnText.textContent = 'Complete Payment';
+  }
+}
+
+payBtn.addEventListener('click', () => {
+  const form = document.getElementById('regForm');
+  if (!form.reportValidity()) return;
+
+  formDataCache = collectFormData();
+
+  // build UPI deep link & QR
+  const upiUrl = buildUpiUrl(UPI_ID, UPI_NAME, AMOUNT_RUPEES);
+  upiTextEl.textContent = `${UPI_ID} • ${UPI_NAME}`;
+  payQRContainer.innerHTML = "";
+  new QRCode(payQRContainer, {
+    text: upiUrl,
+    width: 200,
+    height: 200,
+    colorDark : "#ffffff",
+    colorLight : "transparent",
+    correctLevel : QRCode.CorrectLevel.H
+  });
+
+  paymentOverlay.style.display = 'flex';
+});
+
+closePayment.addEventListener('click', ()=> paymentOverlay.style.display = 'none');
+paymentOverlay.addEventListener('click', (e)=> {
+  if(e.target === paymentOverlay) paymentOverlay.style.display = 'none';
+});
+
+closeSuccess.addEventListener('click', ()=> successOverlay.style.display = 'none');
+okSuccess.addEventListener('click', ()=> successOverlay.style.display = 'none');
+successOverlay.addEventListener('click', (e)=> {
+  if(e.target === successOverlay) successOverlay.style.display = 'none';
+});
+
+/* ---------- Helpers ---------- */
+function collectFormData(){
+  return {
+    name:  document.getElementById('name').value.trim(),
+    regno: document.getElementById('regno').value.trim(),
+    year:  document.getElementById('year').value,
+    dept:  document.getElementById('dept').value,
+    email: document.getElementById('email').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    amount: AMOUNT_RUPEES
+  };
+}
+function buildUpiUrl(upiId, name, amount){
+  return `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
+}
+function generateToken(regno){
+  const suffix = Math.floor(Math.random()*900+100);
+  return `AMZ-${regno}-${suffix}`;
+}
+
+/* Payment Form Submit */
+paymentForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (submitting) return;
+  submitting = true;
+  setCompleteBtnLoading(true);
+
+  const txnId      = document.getElementById('txnId').value.trim();
+  const payerName  = document.getElementById('payerName').value.trim();
+  const paidAmount = Number(document.getElementById('paidAmount').value || AMOUNT_RUPEES);
+
+  if(!txnId){
+    alert("Please enter your Transaction / UTR ID.");
+    submitting = false;
+    setCompleteBtnLoading(false);
+    return;
+  }
+
+  try{
+    const tokenId = generateToken(formDataCache.regno);
+    const paidAt  = new Date().toISOString();
+    const participantNo = await allocateParticipantNumber();
+
+    await savePaymentToFirestore({
+      status: "submitted",
+      amount: paidAmount,
+      paid_at: paidAt,
+      token: tokenId,
+      participant_no: participantNo,
+      transaction_id: txnId,
+      payer_name: payerName || null,
+      upi_id: UPI_ID,
+      ...formDataCache
+    });
+
+    paymentOverlay.style.display = 'none';
+    successOverlay.style.display = 'flex';
+    document.getElementById('regForm').reset();
+    paymentForm.reset();
+  }catch(err){
+    console.error(err);
+    alert("Something went wrong while saving your payment. Please try again or contact the organizers.");
+  }finally{
+    submitting = false;
+    setCompleteBtnLoading(false);
+  }
+});
+
+/* ---------- Firestore ---------- */
+async function savePaymentToFirestore(data){
+  const colRef = collection(db, "event_registrations", EVENT_ID, "payments");
+  const docRef = doc(colRef, data.regno);
+  await setDoc(docRef, {
+    ...data,
+    timestamp: serverTimestamp()
+  });
+}
+async function allocateParticipantNumber(){
+  const counterRef = doc(db, "event_registrations", EVENT_ID);
+  return await runTransaction(db, async (transaction)=>{
+    const docSnap = await transaction.get(counterRef);
+    let current = 0;
+    if(docSnap.exists()){
+      current = docSnap.data().counter || 0;
+    }
+    const next = current + 1;
+    transaction.set(counterRef, { counter: next }, { merge: true });
+    return next;
+  });
+}
+</script>
+</body>
+</html>
